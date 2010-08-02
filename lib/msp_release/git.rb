@@ -21,5 +21,19 @@ module MSPRelease::Git
     exec "git checkout #{branch_name}"
   end
 
+  def added_files
+    status_files("new file")
+  end
+
+  def modified_files
+    status_files("modified")
+  end
+
+  def status_files(status)
+    output = exec "git status", [0,256]
+    pattern = /#{status}: +(.+)$/
+    output.split("\n").map {|l| pattern.match(l) }.compact.map{|m|m[1]}
+  end
+
   extend self
 end

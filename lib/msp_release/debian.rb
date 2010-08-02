@@ -14,7 +14,7 @@ class Debian
 
   def version_bits
     tline = read_top_line
-    match = /msp \(([0-9]+)\.([0-9]+)\.([0-9]+)([^)]*)\)/.match(tline)
+    match = /msp \(([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([^)]*)\))/.match(tline)
     (1..4).map{|i| match[i] }
   end
 
