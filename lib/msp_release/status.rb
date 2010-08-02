@@ -13,9 +13,10 @@ class MSPRelease::Status < MSPRelease::Command
       if on_release_branch?
         puts "On release branch : #{git_version.format}"
         version, suffix = changelog.version_and_suffix
-        puts "Last pushed       : #{version.format}-#{suffix}"
+        puts "Changelog says    : #{version.format}-#{suffix}"
       else
-        puts "confused.com"
+        puts "Not on a release branch"
+        puts "Changelog says    : #{version.format}-#{suffix}"
       end
     end
   end
