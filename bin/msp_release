@@ -1,0 +1,6 @@
+#! /usr/bin/env ruby
+
+$LOAD_PATH.unshift(path = File.expand_path(File.join(File.dirname(__FILE__), "../lib")))
+
+require 'msp_release.rb'
+MSPRelease.run(ARGV)
