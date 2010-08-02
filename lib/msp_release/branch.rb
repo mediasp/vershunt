@@ -1,4 +1,9 @@
 class MSPRelease::Branch < MSPRelease::Command
+
+  def self.description
+    "Create a release branch for MSP::VERSION"
+  end
+
   def run
     fail_if_push_pending
 

@@ -1,4 +1,9 @@
 class MSPRelease::Status < MSPRelease::Command
+
+  def self.description
+    "Print out discovered release state"
+  end
+
   def run
     if data_exists?
       load_data

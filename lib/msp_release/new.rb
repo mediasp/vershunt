@@ -1,5 +1,9 @@
 class MSPRelease::New < MSPRelease::Command
 
+  def self.description
+    "Prepare master or a release branch for a release push"
+  end
+
   def run
     fail_if_push_pending
     fail_if_modified_wc

@@ -3,6 +3,10 @@ class MSPRelease::Push < MSPRelease::Command
   include MSPRelease::Helpers
   include MSPRelease::Exec
 
+  def self.description
+    "Push a new release to origin"
+  end
+
   def run
     unless data_exists?
       $stderr.puts("You need to stage a new release before you can push it")
