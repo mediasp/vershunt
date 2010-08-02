@@ -11,7 +11,8 @@ module MSPRelease::Git
   end
 
   def branch_exists?(branch_name)
-    exec "git show-branch origin/#{branch_name}"
+    # use backticks, we don't want an error
+    `git show-branch origin/#{branch_name}`
     $? == 0
   end
 
