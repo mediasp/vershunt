@@ -20,18 +20,12 @@ module MSPRelease
   module Helpers
     # Slush bucket for stuff :)
     def add_changelog_entry(stub_comment)
-      changelog = Debian.new(".")
+      changelog = project.changelog
       changelog.add(msp_version, timestamp, stub_comment)
     end
 
     def msp_version
-      version_pattern = /VERSION = '([0-9]+)\.([0-9]+)\.([0-9]+)'/
-      @msp_version ||=
-        File.open(MSP_VERSION_FILE, 'r') do |f|
-        v_line = f.readlines.map {|l|version_pattern.match(l)}.compact.first
-        raise "Couldn't parse version from #{MSP_VERSION_FILE}" unless v_line
-        Version.new(* (1..3).map {|i|v_line[i]} )
-      end
+      project.version
     end
 
     def git_version
@@ -59,7 +53,7 @@ module MSPRelease
     end
 
     def changelog
-      @changelog ||= Debian.new(".")
+      @changelog ||= project.changelog
     end
 
     def on_release_branch?
@@ -117,6 +111,7 @@ module MSPRelease
   require 'msp_release/debian'
   require 'msp_release/git'
   require 'msp_release/options'
+  require 'msp_release/project'
 
   MSP_VERSION_FILE = "lib/msp/version.rb"
   DATAFILE = ".msp_release"
@@ -136,11 +131,12 @@ module MSPRelease
     include Helpers
     include Exec
     Git = MSPRelease::Git
-    def initialize(options, arguments)
+    def initialize(project, options, arguments)
+      @project = project
       @options = options
       @arguments = arguments
     end
-    attr_accessor :options, :arguments
+    attr_accessor :options, :arguments, :project
   end
 
   COMMANDS = ['new', 'push', 'branch', 'status', 'reset']
@@ -158,7 +154,9 @@ module MSPRelease
       exit 1
     end
 
-    cmd.new(options, args).run
+    project = MSPRelease::Project.new(".msp_project")
+
+    cmd.new(project, options, args).run
   end
 
   def init_commands

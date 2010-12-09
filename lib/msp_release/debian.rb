@@ -1,8 +1,6 @@
 class Debian
 
-  DEFAULT_PATH = "debian/msp/changelog"
-
-  def initialize(basedir, fname=DEFAULT_PATH)
+  def initialize(basedir, fname)
     @fname = File.join(basedir, fname)
   end
 
@@ -14,7 +12,7 @@ class Debian
 
   def version_bits
     tline = read_top_line
-    match = /msp \(([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([^)]*)\))/.match(tline)
+    match = /[a-z\-]+ \(([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([^)]*)\))/.match(tline)
     (1..4).map{|i| match[i] }
   end
 

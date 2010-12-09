@@ -10,7 +10,7 @@ class MSPRelease::Reset < MSPRelease::Command
       exit 1
     end
 
-    exec "git checkout #{Debian::DEFAULT_PATH}"
+    exec "git checkout #{project.changelog_path}"
     remove_data
     puts "Reset"
   end
