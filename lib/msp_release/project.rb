@@ -3,15 +3,31 @@ class MSPRelease::Project
   DEFAULT_PATH = "debian/msp/changelog"
 
   module Status
-    DEV = 0
-    RC = 1
-    FINAL = 2
+
+    def self.all
+      [:Dev, :RC, :Final]
+    end
+
+    def self.[](const)
+      self.const_get(const)
+    end
+
+    def self.next(const)
+      cur_index = all.index(const)
+      all[cur_index + 1]
+    end
+
+    all.each_with_index do |sym, idx|
+      const_set(sym, idx)
+    end
+
   end
 
-  attr_reader :changelog_path, :ruby_version_file
+  attr_reader :changelog_path, :ruby_version_file, :config, :config_file
 
   def initialize(project_config_file)
-    config = YAML.load_file(project_config_file)
+    @config_file = project_config_file
+    @config = YAML.load_file(project_config_file)
     config.each do |key, value|
       instance_variable_set("@#{key}", value)
     end
@@ -21,8 +37,26 @@ class MSPRelease::Project
     Debian.new(".", changelog_path)
   end
 
+  def status
+    @status || :Dev
+  end
+
+  def status=(status)
+    @status = status
+    config[:status] = status
+    File.open(@config_file, 'w') {|f| f.write(YAML.dump(config)) }
+  end
+
+  def next_status
+    Status.next(status)
+  end
+
   def version_pattern
     /VERSION = '([0-9]+)\.([0-9]+)\.([0-9]+)'/
+  end
+
+  def any_version
+    version || changelog.version
   end
 
   def version
@@ -40,7 +74,7 @@ class MSPRelease::Project
   def bump_version(segment)
     new_version = (version || changelog.version).bump(segment.to_sym)
 
-    if version
+    changed_file = if version
       lines = File.open(ruby_version_file, 'r')  { |f| f.readlines }
       lines = lines.map do |line|
         if match = version_pattern.match(line)
@@ -50,11 +84,13 @@ class MSPRelease::Project
         end
       end
       File.open(ruby_version_file, 'w')  { |f| f.write(lines) }
+      ruby_version_file
     else
       changelog.add(new_version, "New development version")
+      changelog.fname
     end
 
-    new_version
+    [new_version, changed_file]
   end
 
 end

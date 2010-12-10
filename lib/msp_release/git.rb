@@ -36,5 +36,12 @@ module MSPRelease::Git
     output.split("\n").map {|l| pattern.match(l) }.compact.map{|m|m[1]}
   end
 
+  def remote_is_ahead?
+    raise NotImplementedError
+    branch_name = cur_branch
+    exec "git fetch"
+    exec "git --no-pager log origin/#{branch_name} --no-color --oneline -1".split("")
+  end
+
   extend self
 end

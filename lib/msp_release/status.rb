@@ -5,6 +5,7 @@ class MSPRelease::Status < MSPRelease::Command
   end
 
   def run
+    puts "Status : #{project.status}"
     if data_exists?
       load_data
       puts "Awaiting push.  Please update the changelog, then run msp_release push "
