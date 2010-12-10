@@ -34,7 +34,7 @@ class Debian
     deb_version == version
   end
 
-  def bump(version, extra=MSPRelease.timestamp)
+  def amend(version, extra=MSPRelease.timestamp)
     # replace the first line
     tline, *all = File.open(@fname, 'r') {|f|f.readlines}
     cur_version = /^[^\(]+\(([^\)]+).+/.match(tline)[1]

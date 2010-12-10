@@ -65,8 +65,8 @@ class MSPRelease::New < MSPRelease::Command
     msp_version
 
     version, suffix = if changelog.matches(msp_version)
-      puts "Bumping changelog..."
-      changelog.bump(msp_version)
+      puts "Amending changelog..."
+      changelog.amend(msp_version)
     else
       puts "Adding new dev entry to changelog..."
       changelog.add(msp_version, "New dev version")

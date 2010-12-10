@@ -134,12 +134,14 @@ module MSPRelease
 
       raise ArgumentError, "no such segment: #{segment}" unless VERSION_SEGMENTS.include?(segment)
 
+      reset = false
       new_segments = VERSION_SEGMENTS.map do |cur_seg|
         part = self.send(cur_seg)
         if cur_seg == segment
+          reset = true
           part.to_i + 1
         else
-          part
+          reset ? 0 : part
         end.to_s
       end
 
