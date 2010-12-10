@@ -21,8 +21,11 @@ class MSPRelease::Project
     Debian.new(".", changelog_path)
   end
 
+  def version_pattern
+    /VERSION = '([0-9]+)\.([0-9]+)\.([0-9]+)'/
+  end
+
   def version
-    version_pattern = /VERSION = '([0-9]+)\.([0-9]+)\.([0-9]+)'/
 
     return nil unless ruby_version_file
 
@@ -31,6 +34,22 @@ class MSPRelease::Project
       v_line = f.readlines.map {|l|version_pattern.match(l)}.compact.first
       raise "Couldn't parse version from #{ruby_version_file}" unless v_line
       MSPRelease::Version.new(* (1..3).map {|i|v_line[i]} )
+    end
+  end
+
+  def bump_version(new_version)
+    if version
+      lines = File.open(ruby_version_file, 'r')  { |f| f.readlines }
+      lines = lines.map do |line|
+        if match = version_pattern.match(line)
+          line.gsub(/( *VERSION = )'.+'$/, "\\1'#{new_version.to_s}'")
+        else
+          line
+        end
+      end
+      File.open(ruby_version_file, 'w')  { |f| f.write(lines) }
+    else
+      changelog.bump(new_version)
     end
   end
 

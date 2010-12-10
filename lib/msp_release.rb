@@ -18,6 +18,9 @@ module MSPRelease
   include Exec
 
   module Helpers
+
+    PROJECT_FILE = ".msp_project"
+
     # Slush bucket for stuff :)
     def add_changelog_entry(stub_comment)
       changelog = project.changelog
@@ -116,13 +119,33 @@ module MSPRelease
   MSP_VERSION_FILE = "lib/msp/version.rb"
   DATAFILE = ".msp_release"
 
-  Version = Struct.new(:major, :minor, :bugfix)
+  VERSION_SEGMENTS = [:major, :minor, :bugfix]
+  Version = Struct.new(*VERSION_SEGMENTS)
   Version.module_eval do
     def format; "#{major}.#{minor}.#{bugfix}"; end
     alias :to_s :format
+
     def self.from_string(str)
       match = /([0-9]+)\.([0-9]+)\.([0-9]+)/.match(str)
       match && new(*(1..3).map{|i|match[i]})
+    end
+
+    def bump(segment)
+
+      raise ArgumentError, "no such segment: #{segment}" unless VERSION_SEGMENTS.include?(segment)
+
+      new_segments = VERSION_SEGMENTS.map do |cur_seg|
+        part = self.send(cur_seg)
+        if cur_seg == segment
+          part.to_i + 1
+        else
+          part
+        end.to_s
+      end
+
+      "new_segments: #{new_segments}"
+
+      self.class.new(*new_segments)
     end
   end
   Author = Struct.new(:name, :email)
@@ -139,7 +162,7 @@ module MSPRelease
     attr_accessor :options, :arguments, :project
   end
 
-  COMMANDS = ['new', 'push', 'branch', 'status', 'reset']
+  COMMANDS = ['new', 'push', 'branch', 'status', 'reset', 'bump']
 
   def run(args)
     init_commands
@@ -154,7 +177,12 @@ module MSPRelease
       exit 1
     end
 
-    project = MSPRelease::Project.new(".msp_project")
+    if File.exists?(PROJECT_FILE)
+      project = MSPRelease::Project.new(PROJECT_FILE)
+    else
+      $stderr.puts("No #{PROJECT_FILE} present in current directory")
+      exit 1
+    end
 
     cmd.new(project, options, args).run
   end
