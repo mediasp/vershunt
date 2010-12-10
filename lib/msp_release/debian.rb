@@ -10,6 +10,10 @@ class Debian
     File.open(@fname, 'r') {|f|f.readline}
   end
 
+  def package_name
+    /[a-z\-]+/.match(read_top_line)
+  end
+
   def version_bits
     tline = read_top_line
     match = /[a-z\-]+ \(([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([^)]*)\))/.match(tline)
@@ -19,6 +23,10 @@ class Debian
   def version_and_suffix
     maj, min, bf, bumf = version_bits
     [MSPRelease::Version.new(maj, min, bf), bumf]
+  end
+
+  def version
+    version_and_suffix.first
   end
 
   def matches(version)
@@ -66,7 +74,7 @@ class Debian
   end
 
   def create_top_line(v, extra=nil)
-    tline = "msp (#{v.major}.#{v.minor}.#{v.bugfix}"
+    tline = "#{package_name} (#{v.major}.#{v.minor}.#{v.bugfix}"
     tline += "-" + extra if extra
 
     # FIXME, un-hardcode this?

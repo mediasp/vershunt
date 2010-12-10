@@ -37,7 +37,9 @@ class MSPRelease::Project
     end
   end
 
-  def bump_version(new_version)
+  def bump_version(segment)
+    new_version = (version || changelog.version).bump(segment.to_sym)
+
     if version
       lines = File.open(ruby_version_file, 'r')  { |f| f.readlines }
       lines = lines.map do |line|
@@ -49,8 +51,10 @@ class MSPRelease::Project
       end
       File.open(ruby_version_file, 'w')  { |f| f.write(lines) }
     else
-      changelog.bump(new_version)
+      changelog.add(new_version, "New development version")
     end
+
+    new_version
   end
 
 end

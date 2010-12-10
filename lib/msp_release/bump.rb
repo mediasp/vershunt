@@ -6,10 +6,8 @@ class MSPRelease::Bump < MSPRelease::Command
 
   def run
     segment = arguments.last
-    new_version = project.version.bump(segment.to_sym)
-
-    puts "New version #{new_version}"
-    project.bump_version(new_version)
+    new_version = project.bump_version(segment)
+    puts "New version: #{new_version}"
   end
 
 end
