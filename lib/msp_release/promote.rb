@@ -14,10 +14,13 @@ class MSPRelease::Promote < MSPRelease::Command
 #    elsif Git.remote_is_ahead?
 #      $stderr.puts "Your branch is lagging behind.  Please rebase and try again."
 #      exit 1
-    else
+else
+      old_status = project.status
       project.status = project.next_status
+      new_status = project.status
       exec "git add #{project.config_file}"
       exec "git commit -m 'PROMOTE VERSION #{project.any_version} to #{project.status}'"
+      puts "Project status #{old_status}=>#{new_status}"
     end
   end
 end

@@ -51,6 +51,14 @@ class MSPRelease::Project
     Status.next(status)
   end
 
+  def final?; status == :Final; end
+  def rc?; status == :RC; end
+  def dev?; status == :Dev; end
+
+  def at_version?(rhs_version)
+    any_version == rhs_version
+  end
+
   def version_pattern
     /VERSION = '([0-9]+)\.([0-9]+)\.([0-9]+)'/
   end
