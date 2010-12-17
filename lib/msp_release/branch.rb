@@ -12,10 +12,12 @@ class MSPRelease::Branch < MSPRelease::Command
       exit 1
     end
 
-    branch_name = "release-#{msp_version.format}"
+    version = project.any_version
+
+    branch_name = "release-#{version.format}"
 
     if Git.branch_exists?(branch_name)
-      puts "A branch for #{msp_version} already exists"
+      puts "A branch for #{version} already exists"
       exit 1
     end
 

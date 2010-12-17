@@ -49,7 +49,9 @@ class Debian
     [version, extra]
   end
 
-  def add(v, stub, extra=MSPRelease.timestamp)
+  def add(v, stub, extra=nil)
+    extra = MSPRelease.timestamp unless extra
+
     tline = create_top_line(v, extra)
     all = File.open(@fname, 'r') {|f| f.readlines }
     new =
