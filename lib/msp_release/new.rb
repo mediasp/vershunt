@@ -41,7 +41,7 @@ class MSPRelease::New < MSPRelease::Command
   end
 
   def get_next_rc_number(suffix)
-    suffix && (match = /rc([0-9]+)$/.match(suffix)) && match[1] || 1
+    ((suffix && (match = /rc([0-9]+)$/.match(suffix)) && match[1]).to_i || 0) + 1
   end
 
 end
