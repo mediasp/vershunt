@@ -62,13 +62,13 @@ shared_context "project_helpers" do
     version = options.fetch(:version, '0.0.1')
 
     create_project_dir(name)
-    remote_repo = File.expand_path(@project_dir + "/../#{name}-remote.git")
+    @remote_repo = File.expand_path(@project_dir + "/../#{name}-remote.git")
     Dir.chdir(@project_dir + '/..') do
-      exec "git init --bare #{remote_repo}"
+      exec "git init --bare #{@remote_repo}"
     end
 
     in_project_dir(name) do
-      exec "git clone #{remote_repo} ."
+      exec "git clone #{@remote_repo} ."
     end
 
     project = write_project name, <<YAML
@@ -109,6 +109,12 @@ CHANGELOG
     FileUtils.mkdir_p(File.join(@project_dir, File.dirname(fname)))
     File.open(File.join(@project_dir, fname), 'w') do |f|
       yield f
+    end
+  end
+
+  def in_remote_dir
+    Dir.chdir @remote_repo do
+      yield @remote_repo
     end
   end
 

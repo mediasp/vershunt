@@ -22,7 +22,8 @@ class MSPRelease::Push < MSPRelease::Command
     exec "git add #{changelog.fname}"
     exec "git commit -m\"#{RELEASE_COMMIT_PREFIX}#{release_name}\""
     exec "git tag #{tagname}"
-    exec "git push origin release-#{data[:version].format}"
+    exec "git push origin #{Git.cur_branch}"
+    $stdout.puts "Pushing new release tag: #{tagname}"
     exec "git push origin #{tagname}"
 
     remove_data
