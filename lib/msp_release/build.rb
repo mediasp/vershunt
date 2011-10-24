@@ -13,19 +13,35 @@ class MSPRelease::Build < MSPRelease::Command
 
     exec build_command
 
-    changes_file = find_changes_file
+    looking_for = project.changelog.full_version_string
+    changes_file = find_changes_file(looking_for)
+
+    if changes_file
+      $stdout.puts("Package built: #{changes_file}")
+    else
+      $stderr.puts("Unable to find changes file with version: #{looking_for}")
+      $stderr.puts("Available:")
+      available_changes_files.each do |f|
+        $stderr.puts("  #{f}")
+      end
+      exit 1
+    end
   end
 
   private
 
+  def available_changes_files
+    Dir["#{output_directory}/*.changes"]
+  end
+
   def find_changes_file(version)
-    Dir["#{output_directory}/*.changes"].find { |fname|
-     (m =  changes_pattern.match(fname)) && m && m[1] == version
+    available_changes_files.find { |fname|
+      (m = changes_pattern.match(fname)) && m && (m[1] == version)
     }
   end
 
   def changes_pattern
-    /#{changes_prefix}_([^_]+)_([^\.]+)\.changes/
+    /#{package_name}_([^_]+)_([^\.]+)\.changes/
   end
 
   def package_name

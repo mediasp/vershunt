@@ -2,8 +2,10 @@ require 'fileutils'
 require 'tmpdir'
 require 'msp_release'
 require 'popen4'
+require 'yaml'
 
-shared_context "tmpdir" do
+shared_context "project_helpers" do
+
   before do
     @tmpdir = Dir.mktmpdir
   end
@@ -11,10 +13,10 @@ shared_context "tmpdir" do
   after do
     @tmpdir = nil
   end
-end
 
-shared_context "project_helpers" do
-  include_context "tmpdir"
+  before do
+    @bin_path = File.expand_path('bin')
+  end
 
   def run(cmd)
     @last_command = cmd
@@ -48,10 +50,10 @@ shared_context "project_helpers" do
     @project_dir = FileUtils.mkdir(File.join(@tmpdir, name)).first unless @project_dir
   end
 
-  def write_project(name, yaml_string)
+  def write_project(name, to_be_yamled)
     create_project_dir(name)
     fname = File.join(@project_dir, '.msp_project')
-    File.open(fname, 'w') {|f| f.write(yaml_string) }
+    File.open(fname, 'w') {|f| f.write(to_be_yamled.to_yaml) }
     MSPRelease::Project.new(fname)
   end
 
@@ -71,12 +73,15 @@ shared_context "project_helpers" do
       exec "git clone #{@remote_repo} ."
     end
 
-    project = write_project name, <<YAML
----
-:status: :#{status}
-:changelog_path: #{changelog_path}
-:ruby_version_file: #{ruby_version_file}
-YAML
+    deb_options = options.fetch(:deb, {}).
+      map {|k, v| { :"deb_#{k}" => v } }.
+      inject {|a, b| a.merge(b) }
+
+    project = write_project name, {
+      :status => status,
+      :changelog_path =>  changelog_path,
+      :ruby_version_file => ruby_version_file
+    }.merge(deb_options || {})
 
     FileUtils.mkdir_p(File.join(@project_dir, File.dirname(ruby_version_file)))
     File.open(File.join(@project_dir, ruby_version_file), 'w') do |f|
@@ -105,6 +110,10 @@ CHANGELOG
     project
   end
 
+  def run_msp_release(*args)
+    run File.join(@bin_path, 'msp_release') + " #{args.join(' ')}"
+  end
+
   def write_project_file(fname)
     FileUtils.mkdir_p(File.join(@project_dir, File.dirname(fname)))
     File.open(File.join(@project_dir, fname), 'w') do |f|
@@ -118,7 +127,7 @@ CHANGELOG
     end
   end
 
-  def in_project_dir(project_name)
+  def in_project_dir(project_name=@project_name)
     raise 'no project exists' if @project_dir.nil?
     Dir.chdir(@project_dir) do
       yield @project_dir

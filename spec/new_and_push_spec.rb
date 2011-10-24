@@ -9,14 +9,6 @@ describe 'creating and pushing releases' do
       init_project('project', :status => :Dev, :version => '0.0.1')
     end
 
-    before do
-      @bin_path = File.expand_path('bin')
-    end
-
-    def run_msp_release(*args)
-      run File.join(@bin_path, 'msp_release') + " #{args.join(' ')}"
-    end
-
     it 'lets you create a new release commit' do
       project
       project.dev?.should be_true

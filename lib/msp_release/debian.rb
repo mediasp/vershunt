@@ -26,6 +26,10 @@ class Debian
     [MSPRelease::Version.new(maj, min, bf), bumf]
   end
 
+  def full_version_string
+    version_and_suffix.join('-')
+  end
+
   def version
     version_and_suffix.first
   end
