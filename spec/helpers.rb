@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'tmpdir'
 require 'msp_release'
-require 'aruba/api'
+require 'popen4'
 
 shared_context "tmpdir" do
   before do
@@ -9,7 +9,6 @@ shared_context "tmpdir" do
   end
 
   after do
-#    FileUtils.rm_r(@tmpdir)
     @tmpdir = nil
   end
 end
@@ -17,9 +16,32 @@ end
 shared_context "project_helpers" do
   include_context "tmpdir"
 
-  before do
-    #stop aruba from changing our pwd
-#    @dirs = ['.']
+  def run(cmd)
+    @last_command = cmd
+
+    @last_status = POpen4.popen4(@last_command) do |stdout, stderr, stdin, pid|
+      @last_stdout = stdout.read.strip
+      @last_stderr = stderr.read.strip
+      @last_pid = pid
+    end
+  end
+
+  def exec(cmd)
+    run cmd
+    if @last_status.exitstatus != 0
+      raise "command: #{cmd} failed with #{@last_status.exitstatus}\n#{@all_output}"
+    end
+    true
+  end
+
+  def all_output
+    @last_stdout + "\n" + @last_stderr
+  end
+
+  attr_reader :last_stdout, :last_stderr, :last_status
+
+  def assert_exit_status(code=0)
+    @last_status.exitstatus.should eql code
   end
 
   def create_project_dir(name)
@@ -42,11 +64,11 @@ shared_context "project_helpers" do
     create_project_dir(name)
     remote_repo = File.expand_path(@project_dir + "/../#{name}-remote.git")
     Dir.chdir(@project_dir + '/..') do
-      `git init --bare #{remote_repo}`
+      exec "git init --bare #{remote_repo}"
     end
 
     in_project_dir(name) do
-      `git clone #{remote_repo} .`
+      exec "git clone #{remote_repo} ."
     end
 
     project = write_project name, <<YAML
@@ -75,9 +97,9 @@ CHANGELOG
     end
 
     in_project_dir('project') do
-      `git add .msp_project #{changelog_path} #{ruby_version_file}`
-      `git commit -m 'initial commit'`
-      `git push origin master:master`
+      exec "git add .msp_project #{changelog_path} #{ruby_version_file}"
+      exec "git commit -m 'initial commit'"
+      exec "git push origin master:master"
     end
 
     project
@@ -100,7 +122,4 @@ end
 
 RSpec.configure do |config|
   config.color_enabled = true
-  config.include Aruba::Api, :example_group => {
-    :file_path => /spec/
-  }
 end
