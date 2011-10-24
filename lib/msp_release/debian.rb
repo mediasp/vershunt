@@ -17,6 +17,7 @@ class Debian
   def version_bits
     tline = read_top_line
     match = /[a-z\-]+ \(([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([^)]*)\))/.match(tline)
+    raise "couldn't read version info from #{tline}" unless match
     (1..4).map{|i| match[i] }
   end
 

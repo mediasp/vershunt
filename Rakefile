@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'rake'
 
-version = '0.3.6'
+version = '0.4.0'
 
 spec = Gem::Specification.new do |s|
   s.name = 'msp_release'

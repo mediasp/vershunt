@@ -164,7 +164,7 @@ module MSPRelease
     attr_accessor :options, :arguments, :project
   end
 
-  COMMANDS = ['new', 'push', 'branch', 'status', 'reset', 'bump', 'promote']
+  COMMANDS = ['new', 'push', 'branch', 'status', 'reset', 'bump', 'promote', 'build', 'distrib']
 
   def run(args)
     init_commands

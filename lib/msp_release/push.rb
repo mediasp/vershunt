@@ -3,6 +3,8 @@ class MSPRelease::Push < MSPRelease::Command
   include MSPRelease::Helpers
   include MSPRelease::Exec
 
+  RELEASE_COMMIT_PREFIX = "RELEASE COMMIT - "
+
   def self.description
     "Push a new release to origin"
   end
@@ -15,10 +17,13 @@ class MSPRelease::Push < MSPRelease::Command
 
     load_data
     release_name = "#{data[:version].format}-#{data[:suffix]}"
+    tagname = "release-#{release_name}"
+
     exec "git add #{changelog.fname}"
-    exec "git commit -m\"RELEASE COMMIT - #{release_name}\""
-    exec "git tag release-#{release_name}"
-    exec "git push origin release-#{release_name}"
+    exec "git commit -m\"#{RELEASE_COMMIT_PREFIX}#{release_name}\""
+    exec "git tag #{tagname}"
+    exec "git push origin release-#{data[:version].format}"
+    exec "git push origin #{tagname}"
 
     remove_data
   end
