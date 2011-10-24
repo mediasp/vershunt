@@ -182,7 +182,7 @@ module MSPRelease
     if File.exists?(PROJECT_FILE)
       project = MSPRelease::Project.new(PROJECT_FILE)
     else
-      $stderr.puts("No #{PROJECT_FILE} present in current directory")
+      $stderr.puts("No #{PROJECT_FILE} present in current directory: #{`pwd`}")
       exit 1
     end
 

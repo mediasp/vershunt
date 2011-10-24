@@ -11,6 +11,9 @@ spec = Gem::Specification.new do |s|
   s.files = ["bin/msp_release"] + Dir["lib/**/*.rb"]
   s.require_paths = ["lib"]
   s.rubygems_version = '1.3.5'
+
+  s.add_development_dependency('rspec', '~> 2.6.0')
+  s.add_development_dependency('aruba')
 end
 
 
