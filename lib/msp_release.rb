@@ -115,6 +115,7 @@ module MSPRelease
   require 'msp_release/git'
   require 'msp_release/options'
   require 'msp_release/project'
+  require 'msp_release/command'
 
   MSP_VERSION_FILE = "lib/msp/version.rb"
   DATAFILE = ".msp_release"
@@ -150,19 +151,8 @@ module MSPRelease
       self.class.new(*new_segments)
     end
   end
-  Author = Struct.new(:name, :email)
 
-  class Command
-    include Helpers
-    include Exec
-    Git = MSPRelease::Git
-    def initialize(project, options, arguments)
-      @project = project
-      @options = options
-      @arguments = arguments
-    end
-    attr_accessor :options, :arguments, :project
-  end
+  Author = Struct.new(:name, :email)
 
   COMMANDS = ['new', 'push', 'branch', 'status', 'reset', 'bump', 'promote', 'build', 'distrib']
 
@@ -192,10 +182,10 @@ module MSPRelease
   def init_commands
     @commands = {}
     COMMANDS.each do |name|
-      require "msp_release/#{name}"
+      require "msp_release/command/#{name}"
       camel_name =
         name.split(/[^a-z0-9]/i).map{|w| w.capitalize}.join
-      @commands[name] = MSPRelease.const_get(camel_name)
+      @commands[name] = MSPRelease::Command.const_get(camel_name)
     end
   end
 

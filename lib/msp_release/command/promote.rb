@@ -1,4 +1,4 @@
-class MSPRelease::Promote < MSPRelease::Command
+class MSPRelease::Command::Promote < MSPRelease::Command
 
   include MSPRelease::Project::Status
   include MSPRelease::Exec

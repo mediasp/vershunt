@@ -1,4 +1,4 @@
-class MSPRelease::Branch < MSPRelease::Command
+class MSPRelease::Command::Branch < MSPRelease::Command
 
   def self.description
     "Create a release branch for MSP::VERSION"

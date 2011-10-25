@@ -1,4 +1,4 @@
-class MSPRelease::Reset < MSPRelease::Command
+class MSPRelease::Command::Reset < MSPRelease::Command
 
   def self.description
     "Reset changes made by msp_release new"

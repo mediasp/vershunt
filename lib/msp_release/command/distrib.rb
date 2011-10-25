@@ -1,6 +1,6 @@
 
 
-class MSPRelease::Distrib < MSPRelease::Command
+class MSPRelease::Command::Distrib < MSPRelease::Command
   def self.description
     "Distribute a built debian package"
   end

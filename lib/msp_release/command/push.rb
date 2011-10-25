@@ -1,4 +1,4 @@
-class MSPRelease::Push < MSPRelease::Command
+class MSPRelease::Command::Push < MSPRelease::Command
 
   include MSPRelease::Helpers
   include MSPRelease::Exec

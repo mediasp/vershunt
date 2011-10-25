@@ -1,4 +1,4 @@
-class MSPRelease::Bump < MSPRelease::Command
+class MSPRelease::Command::Bump < MSPRelease::Command
 
   include MSPRelease::Exec
 

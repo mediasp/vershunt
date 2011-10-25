@@ -1,4 +1,4 @@
-class MSPRelease::Build < MSPRelease::Command
+class MSPRelease::Command::Build < MSPRelease::Command
 
   def self.description
     "Build debian packages suitable for deployment"
@@ -57,7 +57,7 @@ class MSPRelease::Build < MSPRelease::Command
   end
 
   def fail_unless_release_commit(commit)
-    prefix = MSPRelease::Push::RELEASE_COMMIT_PREFIX
+    prefix = MSPRelease::Command::Push::RELEASE_COMMIT_PREFIX
     message = commit[:message]
 
     if message.index(prefix) != 0

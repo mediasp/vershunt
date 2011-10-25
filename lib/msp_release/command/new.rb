@@ -1,4 +1,4 @@
-class MSPRelease::New < MSPRelease::Command
+class MSPRelease::Command::New < MSPRelease::Command
 
   def self.description
     "Prepare master or a release branch for a release push"

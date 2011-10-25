@@ -1,4 +1,4 @@
-class MSPRelease::Status < MSPRelease::Command
+class MSPRelease::Command::Status < MSPRelease::Command
 
   def self.description
     "Print out discovered release state"
