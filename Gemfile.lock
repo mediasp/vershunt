@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    msp_release (0.3.6)
+    msp_release (0.5.0)
 
 GEM
   remote: http://rubygems.org/

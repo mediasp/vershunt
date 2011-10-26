@@ -21,5 +21,12 @@ class MSPRelease::Command::Status < MSPRelease::Command
         puts "Changelog says    : #{version.format}-#{suffix}"
       end
     end
+
+    puts "Release commit: #{release_name_for_output}"
+  end
+
+  def release_name_for_output
+    commit = Git.latest_commit(project)
+    commit.release_commit? && commit.release_name || '<none>'
   end
 end

@@ -8,7 +8,7 @@ class MSPRelease::Command::Build < MSPRelease::Command
     fail_if_modified_wc
     fail_unless_has_build_command
 
-    commit = Git.latest_commit
+    commit = Git.latest_commit(project)
     fail_unless_release_commit(commit)
 
     exec build_command
@@ -57,12 +57,9 @@ class MSPRelease::Command::Build < MSPRelease::Command
   end
 
   def fail_unless_release_commit(commit)
-    prefix = MSPRelease::Command::Push::RELEASE_COMMIT_PREFIX
-    message = commit[:message]
-
-    if message.index(prefix) != 0
+    if ! commit.release_commit?
       $stderr.puts("HEAD is not a release commit:")
-      $stderr.puts("    #{message[0...40]}...")
+      $stderr.puts("    #{commit.message[0...40]}...")
       exit 1
     end
   end

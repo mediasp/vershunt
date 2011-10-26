@@ -1,5 +1,26 @@
 module MSPRelease::Git
 
+  class Commit
+    attr_reader :message
+    attr_reader :author
+    attr_reader :hash
+
+    def initialize(project, attributes)
+      @project = project
+      attributes.each do |k, v|
+        instance_variable_set(:"@#{k}", v)
+      end
+    end
+
+    def release_commit?
+      !! release_name
+    end
+
+    def release_name
+      @project.release_name_from_message(message)
+    end
+  end
+
   include MSPRelease::Exec
 
   def on_master?
@@ -36,7 +57,7 @@ module MSPRelease::Git
     output.split("\n").map {|l| pattern.match(l) }.compact.map{|m|m[1]}
   end
 
-  def latest_commit
+  def latest_commit(project)
     commit_output =
       exec "git --no-pager log -1 --no-color --full-index --pretty=short".split("\n")
 
@@ -50,7 +71,7 @@ module MSPRelease::Git
       map {|row| message_pattern.match(row)[1] }.
       join(" ")
 
-    {:hash => hash, :author => author, :message => message}
+    Commit.new(project, {:hash => hash, :author => author, :message => message})
   end
 
   def remote_is_ahead?

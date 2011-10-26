@@ -1,6 +1,7 @@
 class MSPRelease::Project
 
   DEFAULT_PATH = "debian/msp/changelog"
+  RELEASE_COMMIT_PREFIX = "RELEASE COMMIT - "
 
   module Status
 
@@ -35,6 +36,24 @@ class MSPRelease::Project
 
   def changelog
     Debian.new(".", changelog_path)
+  end
+
+  # Produce the name of a release using the data that is created with
+  # msp_release new
+  def release_name(release_data)
+    "#{data[:version].format}-#{data[:suffix]}"
+  end
+
+  def release_name_from_message(commit_message)
+    idx = commit_message.index(RELEASE_COMMIT_PREFIX)
+    return nil unless idx == 0
+
+    commit_message[RELEASE_COMMIT_PREFIX.length..-1]
+  end
+
+  # Returns the commit message that should be used for a given release
+  def release_commit_message(release_name)
+    "#{RELEASE_COMMIT_PREFIX}#{release_name}"
   end
 
   def status
