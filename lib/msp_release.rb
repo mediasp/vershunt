@@ -32,7 +32,7 @@ module MSPRelease
     end
 
     def git_version
-      Version.from_string(/release-(.+)/.match(Git.cur_branch)[1])
+      Version.from_string(/release-(.+)/.match(git.cur_branch)[1])
     end
 
     def time; @time ||= Time.now; end
@@ -60,7 +60,7 @@ module MSPRelease
     end
 
     def on_release_branch?
-      !!/release/.match(Git.cur_branch)
+      !!/release/.match(git.cur_branch)
     end
 
     def data
@@ -92,7 +92,7 @@ module MSPRelease
     end
 
     def fail_if_modified_wc
-      annoying_files = Git.modified_files + Git.added_files
+      annoying_files = git.modified_files + git.added_files
       if annoying_files.length > 0
         $stderr.puts("You have modified files in your working copy, and that just won't do")
       annoying_files.each {|f|$stderr.puts("  " + f)}

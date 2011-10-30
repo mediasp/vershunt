@@ -22,7 +22,7 @@ class MSPRelease::Command::Push < MSPRelease::Command
     exec "git add #{changelog.fname}"
     exec "git commit -m\"#{commit_message}\""
     exec "git tag #{tagname}"
-    exec "git push origin #{Git.cur_branch}"
+    exec "git push origin #{git.cur_branch}"
     $stdout.puts "Pushing new release tag: #{tagname}"
     exec "git push origin #{tagname}"
 

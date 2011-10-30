@@ -8,7 +8,7 @@ class MSPRelease::Command::Build < MSPRelease::Command
     fail_if_modified_wc
     fail_unless_has_build_command
 
-    commit = Git.latest_commit(project)
+    commit = git.latest_commit(project)
     fail_unless_release_commit(commit)
 
     exec build_command

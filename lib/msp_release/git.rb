@@ -1,4 +1,4 @@
-module MSPRelease::Git
+class MSPRelease::Git
 
   class Commit
     attr_reader :message
@@ -22,6 +22,10 @@ module MSPRelease::Git
   end
 
   include MSPRelease::Exec
+
+  def initialize(project)
+    @project = project
+  end
 
   def on_master?
     cur_branch == 'master'
@@ -81,5 +85,4 @@ module MSPRelease::Git
     exec "git --no-pager log origin/#{branch_name} --no-color --oneline -1".split("")
   end
 
-  extend self
 end

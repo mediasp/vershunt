@@ -26,7 +26,7 @@ class MSPRelease::Command::Status < MSPRelease::Command
   end
 
   def release_name_for_output
-    commit = Git.latest_commit(project)
+    commit = git.latest_commit(project)
     commit.release_commit? && commit.release_name || '<none>'
   end
 end
