@@ -1,4 +1,5 @@
 require 'thread'
+require 'popen4'
 
 module MSPRelease
   class Exec

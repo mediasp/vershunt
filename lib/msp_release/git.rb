@@ -1,5 +1,3 @@
-require 'popen4'
-
 class MSPRelease::Git
 
   class Commit
