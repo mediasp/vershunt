@@ -1,3 +1,5 @@
+require 'popen4'
+
 class MSPRelease::Git
 
   class Commit
@@ -21,10 +23,11 @@ class MSPRelease::Git
     end
   end
 
-  include MSPRelease::Exec
+  include MSPRelease::Exec::Helpers
 
-  def initialize(project)
+  def initialize(project, options={})
     @project = project
+    @quiet = options.fetch(:quiet, true)
   end
 
   def on_master?
@@ -63,7 +66,7 @@ class MSPRelease::Git
 
   def latest_commit(project)
     commit_output =
-      exec "git --no-pager log -1 --no-color --full-index --pretty=short".split("\n")
+      exec("git --no-pager log -1 --no-color --full-index --pretty=short").split("\n")
 
     commit_pattern = /^commit ([a-z0-9]+)$/
     author_pattern = /^Author: (.+)$/

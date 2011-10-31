@@ -1,7 +1,7 @@
 module MSPRelease
   class Command
     include Helpers
-    include Exec
+    include Exec::Helpers
 
     def initialize(project, options, arguments)
       @project = project

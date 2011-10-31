@@ -1,9 +1,5 @@
 class MSPRelease::Command::Push < MSPRelease::Command
 
-  include MSPRelease::Helpers
-  include MSPRelease::Exec
-
-
   def self.description
     "Push a new release to origin"
   end

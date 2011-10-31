@@ -1,7 +1,6 @@
 class MSPRelease::Command::Promote < MSPRelease::Command
 
   include MSPRelease::Project::Status
-  include MSPRelease::Exec
 
   def self.description
     "Promote the status of the project at its current version"

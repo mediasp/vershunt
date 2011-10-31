@@ -1,7 +1,5 @@
 class MSPRelease::Command::Bump < MSPRelease::Command
 
-  include MSPRelease::Exec
-
   def self.description
     "Increase the version number of the project"
   end

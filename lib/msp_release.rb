@@ -2,20 +2,9 @@ require 'yaml'
 
 module MSPRelease
 
-  module Exec
-    def exec(command, ret_code=0)
-      ret_codes = [*ret_code]
-      res = `#{command}`
-      unless ret_codes.include?($?)
-        $stderr.puts("Command failed: #{command}")
-        $stderr.puts("Return code   : #{$?}")
-        raise "Command failed"
-      end
-      res
-    end
-  end
+  require 'msp_release/exec'
 
-  include Exec
+  include Exec::Helpers
 
   module Helpers
 
@@ -176,7 +165,14 @@ module MSPRelease
       exit 1
     end
 
-    cmd.new(project, options, args).run
+    begin
+      cmd.new(project, options, args).run
+    rescue Exec::UnexpectedExitStatus => e
+      $stderr.puts("Command failed")
+      $stderr.puts("  '#{e.command}' exited with #{e.exitstatus}:")
+      $stderr.write(e.output)
+      exit 1
+    end
   end
 
   def init_commands
