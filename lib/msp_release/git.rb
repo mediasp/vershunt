@@ -23,10 +23,14 @@ class MSPRelease::Git
 
   include MSPRelease::Exec::Helpers
 
-  def initialize(project, options={})
+  def initialize(project, options)
     @project = project
-    @quiet = options.fetch(:quiet, true)
+    @options = options
   end
+
+  def exec_name; 'git'; end
+
+  attr_reader :options
 
   def on_master?
     cur_branch == 'master'

@@ -20,8 +20,19 @@ module MSPRelease
     end
 
     module Helpers
-      def exec(*args)
-        MSPRelease::Exec.exec(*args)
+      def exec(command, options={})
+        # use the options we were constructed with if they exist
+        if respond_to?(:options)
+          options[:quiet] = !self.options.verbose? unless options.has_key? :quiet
+        else
+          puts "no options on #{self}"
+        end
+
+        if respond_to? :exec_name
+          options[:name] = exec_name unless options.has_key? :name
+        end
+
+        MSPRelease::Exec.exec(command, options)
       end
     end
 

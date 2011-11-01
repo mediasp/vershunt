@@ -5,8 +5,8 @@ module MSPRelease
 
     def initialize(project, options, arguments)
       @project = project
-      @git = Git.new(@project)
       @options = options
+      @git = Git.new(@project, @options)
       @arguments = arguments
     end
 

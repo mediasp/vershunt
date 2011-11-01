@@ -167,7 +167,7 @@ module MSPRelease
     end
 
     begin
-      cmd.new(project, options, args).run
+      cmd.new(project, options, leftovers).run
     rescue Exec::UnexpectedExitStatus => e
       $stderr.puts("Command failed")
       $stderr.puts("  '#{e.command}' exited with #{e.exitstatus}:")
