@@ -1,6 +1,18 @@
 #! /usr/bin/env ruby
 
-$LOAD_PATH.unshift(path = File.expand_path(File.join(File.dirname(__FILE__), "../lib")))
+INSTALL_DIR='/usr/lib/msp_release'
 
-require 'msp_release.rb'
+lib_dir =
+  if File.directory?(INSTALL_DIR)
+    # smells like debian, rely on fixed installation locations
+    INSTALL_DIR + '/lib'
+  else
+    # local dev copy, or installed via rubygems
+    require 'rubygems'
+    File.expand_path(File.join(File.dirname(__FILE__), "../lib"))
+  end
+
+$LOAD_PATH.unshift(lib_dir)
+
+require 'msp_release'
 MSPRelease.run(ARGV)
