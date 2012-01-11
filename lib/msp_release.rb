@@ -153,7 +153,7 @@ module MSPRelease
 
   Author = Struct.new(:name, :email)
 
-  COMMANDS = ['new', 'push', 'branch', 'status', 'reset', 'bump', 'promote', 'build', 'distrib']
+  COMMANDS = ['new', 'push', 'branch', 'status', 'reset', 'bump', 'promote', 'build', 'distrib', 'checkout']
 
   def run(args)
     init_commands

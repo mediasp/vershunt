@@ -133,6 +133,12 @@ CHANGELOG
       yield @project_dir
     end
   end
+
+  def in_tmp_dir(&block)
+    Dir.mktmpdir do |tmpdir|
+      Dir.chdir(tmpdir, &block)
+    end
+  end
 end
 
 RSpec.configure do |config|

@@ -1,5 +1,16 @@
 class MSPRelease::Git
 
+  # methods that don't require a local clone
+  module ClassMethods
+    def clone(git_url, out_to=nil)
+      exec "git clone #{git_url} #{out_to.nil?? '' : out_to}"
+    end
+  end
+
+  class << self
+    include ClassMethods
+  end
+
   class Commit
     attr_reader :message
     attr_reader :author
