@@ -1,5 +1,7 @@
 class MSPRelease::Command::Push < MSPRelease::Command
 
+  include WorkingCopyCommand
+
   def self.description
     "Push a new release to origin"
   end

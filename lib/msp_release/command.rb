@@ -1,15 +1,34 @@
 module MSPRelease
   class Command
-    include Helpers
+
+    module WorkingCopyCommand
+
+      include Helpers
+
+      attr_accessor :project, :git
+
+      def initialize(options, leftovers)
+        super
+
+        if File.exists?(PROJECT_FILE)
+          @project = MSPRelease::Project.new(PROJECT_FILE)
+        else
+          raise ExitException.
+            new("No #{PROJECT_FILE} present in current directory")
+        end
+
+        @git = Git.new(@project, @options)
+      end
+
+    end
+
     include Exec::Helpers
 
-    def initialize(project, options, arguments)
-      @project = project
+    def initialize(options, arguments)
       @options = options
-      @git = Git.new(@project, @options)
       @arguments = arguments
     end
 
-    attr_accessor :options, :arguments, :project, :git
+    attr_accessor :options, :arguments
   end
 end

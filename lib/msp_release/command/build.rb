@@ -1,5 +1,7 @@
 class MSPRelease::Command::Build < MSPRelease::Command
 
+  include WorkingCopyCommand
+
   def self.description
     "Build debian packages suitable for deployment"
   end

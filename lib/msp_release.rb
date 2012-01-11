@@ -2,6 +2,16 @@ require 'yaml'
 
 module MSPRelease
 
+  class ExitException < Exception
+
+    attr_reader :error_status
+
+    def initialize(msg, error_status=1)
+      @error_status = error_status
+      super(msg)
+    end
+  end
+
   require 'msp_release/exec'
 
   include Exec::Helpers
@@ -158,15 +168,11 @@ module MSPRelease
       exit 1
     end
 
-    if File.exists?(PROJECT_FILE)
-      project = MSPRelease::Project.new(PROJECT_FILE)
-    else
-      $stderr.puts("No #{PROJECT_FILE} present in current directory: #{`pwd`}")
-      exit 1
-    end
-
     begin
-      cmd.new(project, options, leftovers).run
+      cmd.new(options, leftovers).run
+    rescue ExitException => e
+      $stderr.puts("Command failed: #{e.reason}")
+      exit e.exit_status
     rescue Exec::UnexpectedExitStatus => e
       $stderr.puts("Command failed")
       $stderr.puts("  '#{e.command}' exited with #{e.exitstatus}:")

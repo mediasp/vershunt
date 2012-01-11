@@ -1,5 +1,7 @@
 class MSPRelease::Command::Status < MSPRelease::Command
 
+  include WorkingCopyCommand
+
   def self.description
     "Print out discovered release state"
   end

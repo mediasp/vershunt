@@ -1,5 +1,7 @@
 class MSPRelease::Command::New < MSPRelease::Command
 
+  include WorkingCopyCommand
+
   def self.description
     "Prepare master or a release branch for a release push"
   end

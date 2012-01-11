@@ -1,5 +1,7 @@
 class MSPRelease::Command::Branch < MSPRelease::Command
 
+  include WorkingCopyCommand
+
   def self.description
     "Create a release branch for MSP::VERSION"
   end

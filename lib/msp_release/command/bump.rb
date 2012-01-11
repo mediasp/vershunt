@@ -1,5 +1,7 @@
 class MSPRelease::Command::Bump < MSPRelease::Command
 
+  include WorkingCopyCommand
+
   def self.description
     "Increase the version number of the project"
   end

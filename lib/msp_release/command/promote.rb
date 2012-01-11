@@ -1,5 +1,6 @@
 class MSPRelease::Command::Promote < MSPRelease::Command
 
+  include WorkingCopyCommand
   include MSPRelease::Project::Status
 
   def self.description
