@@ -4,10 +4,10 @@ module MSPRelease
 
   class ExitException < Exception
 
-    attr_reader :error_status
+    attr_reader :exitstatus
 
-    def initialize(msg, error_status=1)
-      @error_status = error_status
+    def initialize(msg, exitstatus=1)
+      @exitstatus = exitstatus
       super(msg)
     end
   end
@@ -171,8 +171,8 @@ module MSPRelease
     begin
       cmd.new(options, leftovers).run
     rescue ExitException => e
-      $stderr.puts("Command failed: #{e.reason}")
-      exit e.exit_status
+      $stderr.puts("Command failed: #{e.message}")
+      exit e.exitstatus
     rescue Exec::UnexpectedExitStatus => e
       $stderr.puts("Command failed")
       $stderr.puts("  '#{e.command}' exited with #{e.exitstatus}:")
