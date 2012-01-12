@@ -34,6 +34,14 @@ class MSPRelease::Project
     end
   end
 
+  def source_package_name
+    debian_dir = File.dirname(changelog_path)
+    control_file = File.join(debian_dir + '/control')
+    source_line = MSPRelease::Exec.exec("grep Source: #{control_file}")
+    match = /^Source: (.+)$/.match(source_line)
+    match && match[1]
+  end
+
   def changelog
     Debian.new(".", changelog_path)
   end
