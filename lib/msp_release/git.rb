@@ -2,8 +2,11 @@ class MSPRelease::Git
 
   # methods that don't require a local clone
   module ClassMethods
-    def clone(git_url, out_to=nil)
-      exec "git clone #{git_url} #{out_to.nil?? '' : out_to}"
+    def clone(git_url, options={})
+      out_to = options[:out_to]
+      exec_options = options[:exec] || {}
+      MSPRelease::Exec.
+        exec("git clone #{git_url} #{out_to.nil?? '' : out_to}", exec_options)
     end
   end
 
