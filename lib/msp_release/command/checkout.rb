@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module MSPRelease
   class Command::Checkout < MSPRelease::Command
 
@@ -8,23 +10,35 @@ module MSPRelease
     def run
       git_url = ARGV[1]
 
-      $stderr.puts("Checking out latest release commit from #{git_url}...")
+      puts("Checking out latest release commit from #{git_url}...")
 
       tmp_dir = "msp_release-#{Time.now.to_i}.tmp"
-      Git.clone(git_url, tmp_dir)
-      Dir.chdir(tmp_dir) do
-        all_commits = exec("git --no-pager --no-color --full-index --pretty=oneline").
-          split("\n")
+      Git.clone(git_url, {:out_to => tmp_dir, :exec => {:quiet => true}})
 
-        first_commit_hash, _ = all_commits.map { |commit_line|
-          match = /^([a-z0-9]) (.+)$/i.match(commit_line)
+      project = Project.new(tmp_dir + "/" + Helpers::PROJECT_FILE)
+
+      src_dir = Dir.chdir(tmp_dir) {
+
+        all_commits = exec("git --no-pager log --no-color --full-index --pretty=oneline").
+        split("\n")
+
+        first_commit_hash, commit_message = all_commits.map { |commit_line|
+          match = /^([a-z0-9]+) (.+)$/i.match(commit_line)
           [match[1], match[2]]
         }.find {|hash, message|
           project.release_name_from_message(message)
         }
 
+        if first_commit_hash.nil?
+          raise ExitException, "Could not find a release commit on master"
+        end
+
         exec "git reset --hard #{first_commit_hash}"
-      end
+        release_name = project.release_name_from_message(commit_message)
+        project.source_package_name + "-" + release_name
+      }
+
+      FileUtils.mv(tmp_dir, src_dir)
     end
 
   end

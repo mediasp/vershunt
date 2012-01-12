@@ -1,8 +1,19 @@
 require 'fileutils'
 require 'tmpdir'
 require 'msp_release'
-require 'popen4'
+require 'open3'
 require 'yaml'
+
+RSpec::Matchers.define :exit_with do |expected|
+  match do |actual|
+    actual[:status].exitstatus == expected
+  end
+
+  failure_message_for_should do |actual|
+    "expected that `#{actual[:command]}` would have exited with: #{expected}\nexited with: #{actual[:status].exitstatus}\nstderr:\n#{actual[:stderr]}\nstdout:\n#{actual[:stdout]}"
+  end
+
+end
 
 shared_context "project_helpers" do
 
@@ -26,6 +37,16 @@ shared_context "project_helpers" do
       @last_stderr = stderr.read.strip
       @last_pid = pid
     end
+  end
+
+  def last_run
+    {
+      :command => @last_command,
+      :stdout  => @last_stdout,
+      :stderr  => @last_stderr,
+      :pid     => @last_pid,
+      :status  => @last_status
+    }
   end
 
   def exec(cmd)
@@ -59,6 +80,7 @@ shared_context "project_helpers" do
 
   def init_project(name, options)
     changelog_path = options.fetch(:changelog_path, "debian/changelog")
+    control_path = 'debian/control'
     ruby_version_file = options.fetch(:ruby_version_file, "lib/#{name}/version.rb")
     status = options.fetch(:status, :Dev)
     version = options.fetch(:version, '0.0.1')
@@ -72,6 +94,7 @@ shared_context "project_helpers" do
     in_project_dir(name) do
       exec "git clone #{@remote_repo} ."
     end
+
 
     deb_options = options.fetch(:deb, {}).
       map {|k, v| { :"deb_#{k}" => v } }.
@@ -101,8 +124,27 @@ shared_context "project_helpers" do
 CHANGELOG
     end
 
+    File.open(File.join(@project_dir, control_path), 'w') do |f|
+      f.puts("""
+Source: project
+Section: misc
+Priority: extra
+Maintainer: Joe Bloggs <joe.bloggs@gmail.com>
+Build-Depends: debhelper (>= 7), autotools-dev
+Standards-Version: 3.8.1
+Homepage: http://dev.playlouder.com/
+
+Package: libproject
+Section: misc
+Architecture: any
+Depends: libc6 (>= 2.4), libruby1.8 (>= 1.8.7), ruby1.8
+Description: Core library
+ Core library for moving bytes from a to b
+""")
+    end
+
     in_project_dir('project') do
-      exec "git add .msp_project #{changelog_path} #{ruby_version_file}"
+      exec "git add .msp_project #{changelog_path} #{ruby_version_file} #{control_path}"
       exec "git commit -m 'initial commit'"
       exec "git push origin master:master"
     end
