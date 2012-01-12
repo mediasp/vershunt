@@ -20,7 +20,8 @@ describe 'checkout' do
         run_msp_release "checkout #{@remote_repo}"
 
         last_run.should exit_with(0)
-        last_stdout.should == "Checking out latest release commit from #{@remote_repo}..."
+        last_stdout.should match("Checking out latest release commit from #{@remote_repo}...")
+        last_stdout.should match("Checked out to project-0.0.1-rc1")
 
         File.directory?('project-0.0.1-rc1').should be_true
         Dir.chdir 'project-0.0.1-rc1' do
@@ -34,7 +35,7 @@ describe 'checkout' do
 
       in_tmp_dir do
         run_msp_release "checkout #{@remote_repo}"
-        last_status.exitstatus.should == 1
+        last_run.should exit_with(1)
         last_stderr.should match("Could not find a release commit on master")
       end
     end

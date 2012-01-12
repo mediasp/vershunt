@@ -39,6 +39,7 @@ module MSPRelease
       }
 
       FileUtils.mv(tmp_dir, src_dir)
+      puts("Checked out to #{src_dir}")
     end
 
   end
