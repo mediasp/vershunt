@@ -5,67 +5,62 @@ describe 'creating and pushing releases' do
 
   describe 'new' do
 
-    let :project do
-      init_project('project', :status => :Dev, :version => '0.0.1')
+    before do
+      @project = init_project('project', :version => '0.0.1')
     end
 
-    it 'lets you create a new release commit' do
-      project
-      project.dev?.should be_true
-
-      in_project_dir 'project' do |dir|
+    it 'fails if you are not on a release branch' do
+      in_project_dir do |dir|
         run_msp_release 'new'
-        assert_exit_status
-        # fixme is there a way to get a timestamp match here?
-        last_stdout.should include("Changelog now at 0.0.1-")
+        last_run.should exit_with(1)
+        last_stderr.should include('You must be on a release branch to create release commits')
+      end
+    end
+
+    it 'creates a ~1 release on a release branch' do
+      in_project_dir do |dir|
+        run_msp_release 'new'
+        run_msp_release 'branch'
+
+        last_run.should exit_with()
+        last_stdout.should include('Changelog now at 0.0.1~1')
       end
     end
 
     it 'will not let you create a release commit if you have an operation pending' do
-      project
-
       in_project_dir 'project' do |dir|
+        run_msp_release 'branch'
         run_msp_release 'new'
+        last_run.should exit_with(0)
         assert_exit_status
 
         run_msp_release 'new'
-        assert_exit_status 1
+        last_run.should exit_with(1)
         last_stderr.should include('You have a release commit pending to be pushed')
       end
     end
 
-    it 'will let you push a release commit' do
-      project
-
-      in_project_dir 'project' do |dir|
+    it 'can create a subsequent ~2 release on a release branch' do
+      in_project_dir do
         run_msp_release 'new'
-        assert_exit_status
-
-        assert_push
-      end
-
-      in_remote_dir do
-        run 'git tag'
-        last_stdout.split('\n').grep(@pushed_tag).first.should_not be_nil
-      end
-    end
-
-    it 'will let you push a release commit from a release branch' do
-      project
-
-      in_project_dir 'project' do |dir|
         run_msp_release 'branch'
-        assert_exit_status
 
-        run_msp_release 'new'
-        assert_exit_status
+        last_run.should exit_with(0)
+        last_stdout.should include('Changelog now at 0.0.1~1')
 
-        assert_push
+        run_msp_release 'push'
       end
 
       in_remote_dir do
         run 'git tag'
         last_stdout.split('\n').grep(@pushed_tag).first.should_not be_nil
+      end
+
+      in_project_dir do
+        run_msp_release 'new'
+        run_msp_release 'branch'
+        last_run.should exit_with(0)
+        last_stdout.should include('Changelog now at 0.0.1~2')
       end
     end
 

@@ -126,7 +126,7 @@ CHANGELOG
 
     File.open(File.join(@project_dir, control_path), 'w') do |f|
       f.puts("""
-Source: project
+Source: #{name}
 Section: misc
 Priority: extra
 Maintainer: Joe Bloggs <joe.bloggs@gmail.com>
@@ -134,7 +134,7 @@ Build-Depends: debhelper (>= 7), autotools-dev
 Standards-Version: 3.8.1
 Homepage: http://dev.playlouder.com/
 
-Package: libproject
+Package: lib#{name}
 Section: misc
 Architecture: any
 Depends: libc6 (>= 2.4), libruby1.8 (>= 1.8.7), ruby1.8

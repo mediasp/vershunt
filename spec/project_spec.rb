@@ -5,27 +5,13 @@ describe 'MSPRelease::Project' do
 
   describe 'reading the project file' do
 
-    it 'can return the status of the project' do
+    it 'can return the source package name of the project' do
       project = write_project('dev_project', {
-          :status => :Dev,
-          :changelog_path => 'debian/changelog',
-          :ruby_version_file => 'lib/my_project/version.rb'
-        })
-      project.dev?.should be_true
+        :changelog_path => 'debian/changelog',
+        :ruby_version_file => 'lib/my_project/version.rb'
+      })
 
-      project = write_project('dev_project', {
-          :status => :RC,
-          :changelog_path => 'debian/changelog',
-          :ruby_version_file => 'lib/my_project/version.rb'
-        })
-      project.rc?.should be_true
-
-      project = write_project('dev_project', {
-          :status => :Final,
-          :changelog_path => 'debian/changelog',
-          :ruby_version_file => 'lib/my_project/version.rb'
-        })
-      project.final?.should be_true
+      project.source_package_name.should == 'dev_project'
     end
 
   end

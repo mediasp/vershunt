@@ -15,14 +15,12 @@ describe 'msp_release status' do
     end
   end
 
-
   it 'shows release commit information if you are on a release commit' do
     in_project_dir 'project' do
-      run_msp_release 'promote'
       run_msp_release 'new'
       run_msp_release 'push'
       run_msp_release 'status'
-      last_stdout.should include('Release commit: 0.0.1-rc1')
+      last_stdout.should include('Release commit: 0.0.1~1')
     end
 
   end

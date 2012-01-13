@@ -11,6 +11,9 @@ describe 'build' do
   it 'fails if no build command has been specified' do
     project = build_init_project('project', {})
     in_project_dir do
+      run_msp_release 'branch'
+      run_msp_release 'new'
+      run_msp_release 'push'
       run_msp_release 'build'
       assert_exit_status 1
       last_stderr.should include('project does not define a build_command')
@@ -39,6 +42,7 @@ describe 'build' do
     })
 
     in_project_dir do
+      run_msp_release 'branch'
       run_msp_release 'new'
       run_msp_release 'push'
       run_msp_release 'build'
@@ -53,6 +57,7 @@ describe 'build' do
     })
 
     in_project_dir do
+      run_msp_release 'branch'
       run_msp_release 'new'
       run_msp_release 'push'
       run_msp_release 'build'
@@ -63,37 +68,37 @@ describe 'build' do
 
   it 'fails if the resulting changes file does not match the expected version' do
 
-    @build_extra = "touch project_0.1.0rc1_all.changes"
+    @build_extra = "touch project_0.1.0~1_all.changes"
 
     project = build_init_project('project', {
       :deb => deb_options
     })
 
     in_project_dir do
-      run_msp_release 'promote'
+      run_msp_release 'branch'
       run_msp_release 'new'
       run_msp_release 'push'
       run_msp_release 'build'
       assert_exit_status 1
-      last_stderr.should include('Unable to find changes file with version: 0.0.1-rc1')
+      last_stderr.should include('Unable to find changes file with version: 0.0.1~1')
     end
   end
 
   it 'calls the build command, scanning for resulting build product' do
 
-    @build_extra = "touch project_0.0.1-rc1_all.changes"
+    @build_extra = "touch project_0.0.1~1_all.changes"
 
     project = build_init_project('project', {
       :deb => deb_options
     })
 
     in_project_dir do
-      run_msp_release 'promote'
+      run_msp_release 'branch'
       run_msp_release 'new'
       run_msp_release 'push'
       run_msp_release 'build'
       assert_exit_status
-      last_stdout.should match(/^Package built: (.+)project_0\.0\.1\-rc1_all\.changes$/)
+      last_stdout.should match(/^Package built: (.+)project_0\.0\.1\-~1_all\.changes$/)
     end
 
   end
