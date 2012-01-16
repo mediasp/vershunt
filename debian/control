@@ -1,5 +1,5 @@
 Source: msp-release
-Section: unknown
+Section: devel
 Priority: extra
 Maintainer: Nick Griffiths <nick@mediasp.com>
 Build-Depends: debhelper (>= 8.0.0)
