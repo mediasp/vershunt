@@ -153,7 +153,7 @@ module MSPRelease
 
   Author = Struct.new(:name, :email)
 
-  COMMANDS = ['new', 'push', 'branch', 'status', 'reset', 'bump', 'promote', 'build', 'distrib', 'checkout']
+  COMMANDS = ['new', 'push', 'branch', 'status', 'reset', 'bump', 'build', 'distrib', 'checkout']
 
   def run(args)
     init_commands
@@ -176,7 +176,7 @@ module MSPRelease
     rescue Exec::UnexpectedExitStatus => e
       $stderr.puts("Command failed")
       $stderr.puts("  '#{e.command}' exited with #{e.exitstatus}:")
-      $stderr.write(e.output)
+      $stderr.puts(e.stderr)
       exit 1
     end
   end
