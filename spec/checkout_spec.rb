@@ -15,7 +15,7 @@ describe 'checkout' do
         run_msp_release "checkout #{@remote_repo}"
 
         last_run.should exit_with(0)
-        last_stdout.should match("Checking out latest release commit from origin/master...")
+        last_stdout.should match("Checking out latest commit from master")
         version_regex = /Checked out to project\-([0-9]{12}~[a-f0-9]{6}~master)/
         last_stdout.should match(version_regex)
 

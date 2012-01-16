@@ -3,27 +3,6 @@ class MSPRelease::Project
   DEFAULT_PATH = "debian/msp/changelog"
   RELEASE_COMMIT_PREFIX = "RELEASE COMMIT - "
 
-  module Status
-
-    def self.all
-      [:Dev, :RC, :Final]
-    end
-
-    def self.[](const)
-      self.const_get(const)
-    end
-
-    def self.next(const)
-      cur_index = all.index(const)
-      all[cur_index + 1]
-    end
-
-    all.each_with_index do |sym, idx|
-      const_set(sym, idx)
-    end
-
-  end
-
   attr_reader :changelog_path, :ruby_version_file, :config, :config_file
 
   def initialize(project_config_file)
@@ -63,24 +42,6 @@ class MSPRelease::Project
   def release_commit_message(release_name)
     "#{RELEASE_COMMIT_PREFIX}#{release_name}"
   end
-
-  def status
-    @status || :Dev
-  end
-
-  def status=(status)
-    @status = status
-    config[:status] = status
-    File.open(@config_file, 'w') {|f| f.write(YAML.dump(config)) }
-  end
-
-  def next_status
-    Status.next(status)
-  end
-
-  def final?; status == :Final; end
-  def rc?; status == :RC; end
-  def dev?; status == :Dev; end
 
   def at_version?(rhs_version)
     any_version == rhs_version

@@ -9,10 +9,14 @@ module MSPRelease
 
     def run
       git_url = ARGV[1]
-      release_spec_arg = ARGV[2] || 'master'
-      pathspec = "origin/#{release_spec_arg}"
+      release_spec_arg = ARGV[2]
+      pathspec = "origin/#{release_spec_arg || 'master'}"
 
-      puts("Checking out latest release commit from #{pathspec}...")
+      if release_spec_arg
+        puts("Checking out latest release commit from #{pathspec}")
+      else
+        puts("Checking out latest commit from master")
+      end
 
       tmp_dir = "msp_release-#{Time.now.to_i}.tmp"
       Git.clone(git_url, {:out_to => tmp_dir, :exec => {:quiet => true}})

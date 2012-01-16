@@ -9,7 +9,6 @@ class MSPRelease::Command::Bump < MSPRelease::Command
   def run
     segment = arguments.last
     new_version, changed_file = project.bump_version(segment)
-    project.status = :Dev
     [changed_file, project.config_file].each do |file|
       exec "git add #{file}"
     end
