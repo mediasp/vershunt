@@ -16,7 +16,7 @@ class Debian
 
   def version_bits
     tline = read_top_line
-    match = /[a-z\-]+ \(([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([^)]*)\))/.match(tline)
+    match = /[a-z\-]+ \(([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([^)]*)\))?/.match(tline)
     raise "couldn't read version info from #{tline}" unless match
     (1..4).map{|i| match[i] }
   end
@@ -82,7 +82,7 @@ class Debian
 
   def create_top_line(v, extra=nil)
     tline = "#{package_name} (#{v.major}.#{v.minor}.#{v.bugfix}"
-    tline += "-" + extra if extra
+    tline += "-" + extra.to_s if extra
 
     # FIXME, un-hardcode this?
     tline + ") unstable; urgency=low"

@@ -4,7 +4,7 @@ require 'msp_release'
 require 'open3'
 require 'yaml'
 
-RSpec::Matchers.define :exit_with do |expected|
+RSpec::Matchers.define :exit_with do |expected, _|
   match do |actual|
     actual[:status].exitstatus == expected
   end
@@ -115,7 +115,7 @@ shared_context "project_helpers" do
 
     write_project_file changelog_path do |f|
       f.puts <<CHANGELOG
-#{name} (#{version}-123435) unstable; urgency=low
+#{name} (#{version}) unstable; urgency=low
 
   * First release
 

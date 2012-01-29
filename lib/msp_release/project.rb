@@ -67,6 +67,10 @@ class MSPRelease::Project
     end
   end
 
+  def branch_name(version=self.version)
+    "release-#{version.format}"
+  end
+
   def bump_version(segment)
     new_version = (version || changelog.version).bump(segment.to_sym)
 

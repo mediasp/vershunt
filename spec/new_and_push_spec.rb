@@ -17,13 +17,15 @@ describe 'creating and pushing releases' do
       end
     end
 
-    it 'creates a ~1 release on a release branch' do
+    it 'creates a -1 release on a release branch' do
       in_project_dir do |dir|
-        run_msp_release 'new'
         run_msp_release 'branch'
+        last_run.should exit_with(0)
 
-        last_run.should exit_with()
-        last_stdout.should include('Changelog now at 0.0.1~1')
+        run_msp_release 'new'
+
+        last_run.should exit_with(0)
+        last_stdout.should include("Changelog now at 0.0.1-1\n")
       end
     end
 
@@ -40,27 +42,19 @@ describe 'creating and pushing releases' do
       end
     end
 
-    it 'can create a subsequent ~2 release on a release branch' do
+    it 'can create a subsequent -2 release on a release branch' do
       in_project_dir do
-        run_msp_release 'new'
         run_msp_release 'branch'
+        run_msp_release 'new'
 
-        last_run.should exit_with(0)
-        last_stdout.should include('Changelog now at 0.0.1~1')
+        last_stdout.should include('Changelog now at 0.0.1-1')
 
         run_msp_release 'push'
-      end
-
-      in_remote_dir do
-        run 'git tag'
-        last_stdout.split('\n').grep(@pushed_tag).first.should_not be_nil
-      end
-
-      in_project_dir do
-        run_msp_release 'new'
-        run_msp_release 'branch'
         last_run.should exit_with(0)
-        last_stdout.should include('Changelog now at 0.0.1~2')
+
+        run_msp_release 'new'
+        last_run.should exit_with(0)
+        last_stdout.should include('Changelog now at 0.0.1-2')
       end
     end
 

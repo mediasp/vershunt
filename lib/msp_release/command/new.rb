@@ -9,41 +9,39 @@ class MSPRelease::Command::New < MSPRelease::Command
   def run
     fail_if_push_pending
     fail_if_modified_wc
+    fail_unless_on_release_branch
 
     deb_version, suffix = changelog.version_and_suffix
     project_version = project.any_version
 
-    if project.final? && suffix == 'final'
-      $stderr.puts("You've already performed a final release on this version")
-      exit 1
-    end
+    new_suffix = get_next_release_number(suffix)
 
-    next_suffix = if project.final?
-      'final'
-    elsif project.rc?
-      "rc#{get_next_rc_number(suffix)}"
-    else
-      nil
-    end
+    puts "Adding new entry to changelog..."
+    changelog.add(project_version, "New release", new_suffix)
 
-    used_version, used_suffix = if project.at_version?(deb_version) && next_suffix.nil?
-      puts "Amending changelog..."
-      changelog.amend(project_version)
-    else
-      puts "Adding new entry to changelog..."
-      changelog.add(project_version, "New release", next_suffix)
-    end
-
-    self.data = {:version => project_version, :suffix => used_suffix}
+    self.data = {:version => project_version, :suffix => new_suffix}
     save_data
 
-    puts "Changelog now at #{used_version}-#{used_suffix}"
+    puts "Changelog now at #{project_version}-#{new_suffix}"
 
     puts_changelog_info
   end
 
-  def get_next_rc_number(suffix)
-    ((suffix && (match = /rc([0-9]+)$/.match(suffix)) && match[1]).to_i || 0) + 1
+  def fail_unless_on_release_branch
+    if git.cur_branch != project.branch_name
+      $stderr.puts("You must be on a release branch to create release commits")
+      $stderr.puts("Switch to a release branch, or build from any branch without creating a release commit for development builds")
+      exit 1
+    end
+  end
+
+  def get_next_release_number(suffix)
+    suffix_pattern = /([0-9]+)/
+    if suffix.nil? || suffix_pattern.match(suffix)
+      suffix.to_i + 1
+    else
+      raise ExitException, "malformed suffix: #{suffix}\Fix the changelog and try again"
+    end
   end
 
 end
