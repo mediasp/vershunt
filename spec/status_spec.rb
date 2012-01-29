@@ -11,6 +11,7 @@ describe 'msp_release status' do
     in_project_dir 'project' do
       run_msp_release 'status'
       last_stdout.should include('Release commit: <none>')
+      last_stdout.should match(/Changelog says +: +0\.0\.1$/)
     end
   end
 
@@ -21,6 +22,7 @@ describe 'msp_release status' do
       run_msp_release 'push'
       run_msp_release 'status'
       last_stdout.should include('Release commit: 0.0.1-1')
+      last_stdout.should match(/Changelog says +: +0\.0\.1-1$/)
     end
   end
 
