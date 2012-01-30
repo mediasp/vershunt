@@ -21,10 +21,6 @@ module MSPRelease
     PROJECT_FILE = ".msp_project"
 
     # Slush bucket for stuff :)
-    def add_changelog_entry(stub_comment)
-      changelog = project.changelog
-      changelog.add(msp_version, timestamp, stub_comment)
-    end
 
     def msp_version
       project.version
