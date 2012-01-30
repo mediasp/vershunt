@@ -55,7 +55,7 @@ class Debian
       end
 
       def bump
-        self.class.new(@major, @minor, @bugfix, @revision.to_i + 1).to_s)
+        self.class.new(@major, @minor, @bugfix, @revision.to_i + 1).to_s
       end
 
       def to_s
