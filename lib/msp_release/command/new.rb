@@ -11,18 +11,18 @@ class MSPRelease::Command::New < MSPRelease::Command
     fail_if_modified_wc
     fail_unless_on_release_branch
 
-    deb_version, suffix = changelog.version_and_suffix
+    deb_version = changelog.version
     project_version = project.any_version
 
-    new_suffix = get_next_release_number(suffix)
+    new_version = deb_version.bump
 
     puts "Adding new entry to changelog..."
-    changelog.add(project_version, "New release", new_suffix)
+    changelog.add(new_version, "New release")
 
-    self.data = {:version => project_version, :suffix => new_suffix}
+    self.data = {:version => new_version}
     save_data
 
-    puts "Changelog now at #{project_version}-#{new_suffix}"
+    puts "Changelog now at #{new_version}"
 
     puts_changelog_info
   end

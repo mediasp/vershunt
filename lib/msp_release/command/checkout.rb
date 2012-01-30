@@ -3,6 +3,8 @@ require 'fileutils'
 module MSPRelease
   class Command::Checkout < MSPRelease::Command
 
+    include Debian::Versions
+
     def self.description
       "Checkout a release commit from a git repository"
     end
@@ -10,7 +12,8 @@ module MSPRelease
     def run
       git_url = ARGV[1]
       release_spec_arg = ARGV[2]
-      pathspec = "origin/#{release_spec_arg || 'master'}"
+      branch_name = release_spec_arg || 'master'
+      pathspec = "origin/#{branch_name}"
 
       if release_spec_arg
         puts("Checking out latest release commit from #{pathspec}")
@@ -25,18 +28,27 @@ module MSPRelease
 
       src_dir = Dir.chdir(tmp_dir) do
 
-        move_to(pathspec) unless pathspec == 'origin/master'
+        if pathspec != "origin/master"
+          # look for a release commit
+          move_to(pathspec)
 
-        first_commit_hash, commit_message =
-          find_first_release_commit(project)
+          first_commit_hash, commit_message =
+            find_first_release_commit(project)
 
-        if first_commit_hash.nil?
-          raise ExitException, "Could not find a release commit on #{pathspec}"
+          if first_commit_hash.nil?
+            raise ExitException, "Could not find a release commit on #{pathspec}"
+          end
+
+          exec "git reset --hard #{first_commit_hash}"
+
+        else
+          dev_version = Development.
+            new_from_working_directory(branch_name, latest_commit_hash)
+
+          project.changelog.amend(dev_version)
         end
 
-        exec "git reset --hard #{first_commit_hash}"
-        release_name = project.release_name_from_message(commit_message)
-        project.source_package_name + "-" + release_name
+        project.source_package_name + "-" + project.changelog.version.to_s
       end
 
       FileUtils.mv(tmp_dir, src_dir)
@@ -45,12 +57,25 @@ module MSPRelease
 
     private
 
+    def oneline_pattern
+      /^([a-z0-9]+) (.+)$/i
+    end
+
+    def log_command
+      "git --no-pager log --no-color --full-index"
+    end
+
+    def latest_commit_hash
+      output = exec(log_command + " --pretty=oneline -1").split("\n").first
+      oneline_pattern.match(output)[1]
+    end
+
     def find_first_release_commit(project)
-      all_commits = exec("git --no-pager log --no-color --full-index --pretty=oneline").
+      all_commits = exec(log_command +  " --pretty=oneline").
         split("\n")
 
       all_commits.map { |commit_line|
-        match = /^([a-z0-9]+) (.+)$/i.match(commit_line)
+        match = oneline_pattern.match(commit_line)
         [match[1], match[2]]
       }.find {|hash, message|
         project.release_name_from_message(message)

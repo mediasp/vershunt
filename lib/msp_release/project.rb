@@ -72,7 +72,7 @@ class MSPRelease::Project
   end
 
   def bump_version(segment)
-    new_version = (version || changelog.version).bump(segment.to_sym)
+    new_version = (any_version).bump(segment.to_sym)
 
     changed_file = if version
       lines = File.open(ruby_version_file, 'r')  { |f| f.readlines }

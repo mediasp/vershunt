@@ -16,7 +16,7 @@ describe 'checkout' do
 
         last_run.should exit_with(0)
         last_stdout.should match("Checking out latest commit from master")
-        version_regex = /Checked out to project\-([0-9]{12}~[a-f0-9]{6}~master)/
+        version_regex = /Checked out to project\-([0-9]{14}-git\+[a-f0-9]{6}~master)/
         last_stdout.should match(version_regex)
 
         package_version = version_regex.match(last_stdout)[1]
@@ -25,7 +25,8 @@ describe 'checkout' do
         File.directory?(full_package_name).should be_true
         Dir.chdir full_package_name do
           run_msp_release 'status'
-          last_stdout.should match('Changelog says: #{package_version}')
+          last_run.should exit_with(0)
+          last_stdout.should include("Changelog says : #{package_version}")
         end
       end
     end
@@ -49,13 +50,13 @@ describe 'checkout' do
         run_msp_release "checkout #{@remote_repo} release-0.0.1"
 
         last_run.should exit_with(0)
-        last_stdout.should match("Checking out latest release commit from origin/release-0.0.1...")
-        last_stdout.should match("Checked out to project-0.0.1~1")
+        last_stdout.should match("Checking out latest release commit from origin/release-0.0.1")
+        last_stdout.should match("Checked out to project-0.0.1-1")
 
-        File.directory?('project-0.0.1~1').should be_true
-        Dir.chdir 'project-0.0.1~1' do
+        File.directory?('project-0.0.1-1').should be_true
+        Dir.chdir 'project-0.0.1-1' do
           run_msp_release 'status'
-          last_stdout.should match('^Release commit: 0.0.1~1')
+          last_stdout.should match('^Release commit: 0.0.1-1')
           last_stdout.should match('^On release branch : 0.0.1')
         end
       end
