@@ -7,31 +7,37 @@ class MSPRelease::Command::Status < MSPRelease::Command
   end
 
   def run
+    bits = []
+
     if data_exists?
       load_data
       puts "Awaiting push.  Please update the changelog, then run msp_release push "
-      puts "Pending : #{data[:version].format}-#{data[:suffix]}"
+      bits.push(["Pending", data[:version]])
     else
       changelog_version = changelog.version
 
-      puts "Project says     : #{msp_version}" if msp_version
-      if on_release_branch?
-        puts "On release branch : #{git_version.format}"
-      else
-        puts "Not on a release branch"
-      end
-
-      puts "Changelog says : #{changelog_version}"
+      bits.push(["Project says", msp_version]) if msp_version
+      bits.push(["Release branch", on_release_branch?? git_version : nil])
+      bits.push(["Changelog says", changelog_version])
     end
 
-    puts "Release commit: #{release_name_for_output}"
+    bits.push(["Release commit", release_name_for_output])
+
+    format_bits(bits)
   end
 
-  def changelog_version
+  private
+
+  def format_bits(bits)
+    bits = bits.map {|header, value| [header, value.nil?? '<none>' : value.to_s ]}
+    widths = bits.transpose.map { |column| column.map {|v| v.length }.max }
+    bits.each do |row|
+      puts row.zip(widths).map {|val, width| val.ljust(width) }.join(" : ").strip
+    end
   end
 
   def release_name_for_output
     commit = git.latest_commit(project)
-    commit.release_commit? && commit.release_name || '<none>'
+    commit.release_commit? && commit.release_name || nil
   end
 end

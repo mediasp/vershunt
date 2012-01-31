@@ -56,8 +56,8 @@ describe 'checkout' do
         File.directory?('project-0.0.1-1').should be_true
         Dir.chdir 'project-0.0.1-1' do
           run_msp_release 'status'
-          last_stdout.should match('^Release commit: 0.0.1-1')
-          last_stdout.should match('^On release branch : 0.0.1')
+          last_stdout.should match('^Release commit : 0.0.1-1')
+          last_stdout.should match('^Release branch : 0.0.1')
         end
       end
     end
