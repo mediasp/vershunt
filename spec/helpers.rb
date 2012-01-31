@@ -75,7 +75,7 @@ shared_context "project_helpers" do
     create_project_dir(name)
     fname = File.join(@project_dir, '.msp_project')
     File.open(fname, 'w') {|f| f.write(to_be_yamled.to_yaml) }
-    MSPRelease::Project.new(fname)
+    MSPRelease::Project.new_from_project_file(fname)
   end
 
   def init_project(name, options)
@@ -102,15 +102,18 @@ shared_context "project_helpers" do
 
     project = write_project name, {
       :status => status,
-      :changelog_path =>  changelog_path,
-      :ruby_version_file => ruby_version_file
-    }.merge(deb_options || {})
+      :changelog_path =>  changelog_path
+    }.merge(deb_options || {}).
+      merge(ruby_version_file.nil?? {} :
+      {:ruby_version_file => ruby_version_file})
 
-    FileUtils.mkdir_p(File.join(@project_dir, File.dirname(ruby_version_file)))
-    File.open(File.join(@project_dir, ruby_version_file), 'w') do |f|
-      f.puts('module SomeModule')
-      f.puts("  VERSION = '#{version}'")
-      f.puts('end')
+    if ruby_version_file
+      FileUtils.mkdir_p(File.join(@project_dir, File.dirname(ruby_version_file)))
+      File.open(File.join(@project_dir, ruby_version_file), 'w') do |f|
+        f.puts('module SomeModule')
+        f.puts("  VERSION = '#{version}'")
+        f.puts('end')
+      end
     end
 
     write_project_file changelog_path do |f|

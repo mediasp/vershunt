@@ -2,6 +2,12 @@ class Debian
 
   module Versions
 
+    module Versionable
+      def to_version
+        MSPRelease::Version.new(@major, @minor, @bugfix)
+      end
+    end
+
     class Base
 
       def self.new_if_matches(string)
@@ -22,8 +28,14 @@ class Debian
 
     class Unreleased < Base
 
+      include Versionable
+
       def self.pattern
         /^([0-9]+)\.([0-9]+)\.([0-9]+)$/
+      end
+
+      def self.new_from_version(version)
+        new(version.major, version.minor, version.bugfix)
       end
 
       def initialize(major, minor, bugfix)
@@ -42,6 +54,8 @@ class Debian
     end
 
     class Stable < Base
+
+      include Versionable
 
       def self.pattern
         /^([0-9]+)\.([0-9]+)\.([0-9]+)-([0-9]+)$/

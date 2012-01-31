@@ -11,7 +11,7 @@ module MSPRelease
         super
 
         if File.exists?(PROJECT_FILE)
-          @project = MSPRelease::Project.new(PROJECT_FILE)
+          @project = MSPRelease::Project.new_from_project_file(PROJECT_FILE)
         else
           raise ExitException.
             new("No #{PROJECT_FILE} present in current directory")
