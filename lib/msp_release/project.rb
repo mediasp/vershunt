@@ -6,7 +6,7 @@ class MSPRelease::Project
   DEFAULT_PATH = "debian/msp/changelog"
   RELEASE_COMMIT_PREFIX = "RELEASE COMMIT - "
 
-  attr_reader :changelog_path, :config, :config_file
+  attr_reader :config, :config_file
 
   def self.new_from_project_file(filename)
     config = YAML.load_file(filename)
@@ -23,6 +23,10 @@ class MSPRelease::Project
     config.each do |key, value|
       instance_variable_set("@#{key}", value)
     end
+  end
+
+  def changelog_path
+    @changelog_path || 'debian/changelog'
   end
 
   def source_package_name
