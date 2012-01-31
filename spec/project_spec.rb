@@ -8,7 +8,7 @@ describe 'MSPRelease::Project' do
   end
 
   let :project do
-    MSPRelease::Project.new('.msp_project')
+    MSPRelease::Project.new_from_project_file('.msp_project')
   end
 
   it 'can return the source package name' do

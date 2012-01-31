@@ -24,7 +24,7 @@ module MSPRelease
       tmp_dir = "msp_release-#{Time.now.to_i}.tmp"
       Git.clone(git_url, {:out_to => tmp_dir, :exec => {:quiet => true}})
 
-      project = Project.new(tmp_dir + "/" + Helpers::PROJECT_FILE)
+      project = Project.new_from_project_file(tmp_dir + "/" + Helpers::PROJECT_FILE)
 
       src_dir = Dir.chdir(tmp_dir) do
 
