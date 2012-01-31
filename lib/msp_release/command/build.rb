@@ -15,7 +15,7 @@ class MSPRelease::Command::Build < MSPRelease::Command
 
     exec build_command
 
-    looking_for = project.changelog.full_version_string
+    looking_for = project.changelog.version.to_s
     changes_file = find_changes_file(looking_for)
 
     if changes_file

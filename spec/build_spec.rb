@@ -80,13 +80,13 @@ describe 'build' do
       run_msp_release 'push'
       run_msp_release 'build'
       assert_exit_status 1
-      last_stderr.should include('Unable to find changes file with version: 0.0.1~1')
+      last_stderr.should include('Unable to find changes file with version: 0.0.1-1')
     end
   end
 
   it 'calls the build command, scanning for resulting build product' do
 
-    @build_extra = "touch project_0.0.1~1_all.changes"
+    @build_extra = "touch project_0.0.1-1_all.changes"
 
     project = build_init_project('project', {
       :deb => deb_options
@@ -98,7 +98,7 @@ describe 'build' do
       run_msp_release 'push'
       run_msp_release 'build'
       assert_exit_status
-      last_stdout.should match(/^Package built: (.+)project_0\.0\.1\-~1_all\.changes$/)
+      last_stdout.should match(/^Package built: (.+)project_0\.0\.1\-1_all\.changes$/)
     end
 
   end
