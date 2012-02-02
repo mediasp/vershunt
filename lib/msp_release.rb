@@ -110,7 +110,9 @@ module MSPRelease
   require 'msp_release/git'
   require 'msp_release/options'
   require 'msp_release/project'
+  require 'msp_release/build'
   require 'msp_release/command'
+
 
   MSP_VERSION_FILE = "lib/msp/version.rb"
   DATAFILE = ".msp_release"
@@ -151,11 +153,17 @@ module MSPRelease
 
   COMMANDS = ['new', 'push', 'branch', 'status', 'reset', 'bump', 'build', 'distrib', 'checkout']
 
+  def extract_global_args(args)
+    command_index = args.index {|a| /^[^\-]/.match(a) }
+    [args[0...command_index], args[command_index], args[command_index+1..-1]]
+  end
+
   def run(args)
     init_commands
     # TODO there aren't any global options yet, so get rid?
-    options, leftovers = MSPRelease::Options.get(args)
-    cmd_name, = leftovers
+    global_args, cmd_name, command_args = extract_global_args(args)
+    options, leftovers = MSPRelease::Options.get(global_args)
+
     cmd = @commands[cmd_name]
 
     unless cmd
@@ -165,7 +173,7 @@ module MSPRelease
     end
 
     begin
-      cmd.new(options, leftovers).run
+      cmd.new(options, command_args).run
     rescue ExitException => e
       $stderr.puts("Command failed: #{e.message}")
       exit e.exitstatus

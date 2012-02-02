@@ -8,6 +8,12 @@ describe 'build' do
     @deb_exit_code = 0
   end
 
+  describe 'development builds' do
+  end
+
+  describe 'stable builds' do
+  end
+
   it 'fails if no build command has been specified' do
     project = build_init_project('project', {})
     in_project_dir do
@@ -103,19 +109,4 @@ describe 'build' do
 
   end
 
-  def build_init_project(*args)
-    init_project(*args)
-    in_project_dir do |dir|
-      Dir.mkdir('bin')
-      build_cmd = 'bin/build-debs.sh'
-      File.open(build_cmd, 'w') do |f|
-        f.write <<BASH
-#!/bin/bash
-echo 'lolcats'
-#{@build_extra}
-BASH
-      end
-      FileUtils.chmod 0755, build_cmd
-    end
-  end
 end

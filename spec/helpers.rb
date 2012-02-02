@@ -155,6 +155,24 @@ Description: Core library
     project
   end
 
+  def build_init_project(*args)
+    init_project(*args)
+    in_project_dir do |dir|
+      Dir.mkdir('bin')
+      build_cmd = 'bin/build-debs.sh'
+      File.open(build_cmd, 'w') do |f|
+        f.write <<BASH
+#!/bin/bash
+#{@build_extra}
+BASH
+      end
+      FileUtils.chmod 0755, build_cmd
+      exec "git add #{build_cmd}"
+      exec "git commit -m 'build command'"
+      exec "git push origin master:master"
+    end
+  end
+
   def run_msp_release(*args)
     run File.join(@bin_path, 'msp_release') + " #{args.join(' ')}"
   end

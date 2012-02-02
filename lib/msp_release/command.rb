@@ -26,9 +26,13 @@ module MSPRelease
 
     def initialize(options, arguments)
       @options = options
-      @arguments = arguments
+      @arguments, @switches = extract_args(arguments)
     end
 
-    attr_accessor :options, :arguments
+    def extract_args(arguments)
+      arguments.partition {|a| /^[^\-]/.match(a) }
+    end
+
+    attr_accessor :options, :arguments, :switches
   end
 end

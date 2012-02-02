@@ -10,8 +10,9 @@ module MSPRelease
     end
 
     def run
-      git_url = ARGV[1]
-      release_spec_arg = ARGV[2]
+      git_url = arguments[0]
+      release_spec_arg = arguments[1]
+
       branch_name = release_spec_arg || 'master'
       pathspec = "origin/#{branch_name}"
 
@@ -52,7 +53,21 @@ module MSPRelease
       end
 
       FileUtils.mv(tmp_dir, src_dir)
-      puts("Checked out to #{src_dir}")
+      $stdout.puts("Checked out to #{src_dir}")
+
+      if switches.include?("--build")
+        build = Build.new(src_dir, project)
+        begin
+          result = build.perform!
+          changes_file = File.expand_path(result.changes_file)
+          $stdout.puts("Package built: #{changes_file}")
+        rescue Build::NoChangesFileError
+          raise ExitException.new(
+            "Unable to find changes file with version: #{looking_for}" +
+            "Available: \n" +
+            available_changes_files.map { |f| "  #{f}" }.join("\n"))
+        end
+      end
     end
 
     private
