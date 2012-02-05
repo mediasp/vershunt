@@ -1,3 +1,9 @@
+msp-release (1.0.0) msp; urgency=low
+
+  * New major version with new style versioning and support for building from source
+
+ -- Nick Griffiths <nick@matai>  Sun, 05 Feb 2012 14:34:28 +0000
+
 msp-release (0.5.0~1) msp; urgency=low
 
   * Fix shebang to ensure it runs in ruby1.8
