@@ -187,7 +187,7 @@ class Debian
     tline = "#{package_name} (#{v})"
 
     # FIXME, un-hardcode this?
-    tline + ") #{distribution}; urgency=low"
+    tline + " #{distribution}; urgency=low"
   end
 
 

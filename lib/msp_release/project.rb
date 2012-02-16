@@ -10,15 +10,17 @@ class MSPRelease::Project
 
   def self.new_from_project_file(filename)
     config = YAML.load_file(filename)
+    dirname = File.expand_path(File.dirname(filename))
 
     if config[:ruby_version_file]
-      Ruby.new(config)
+      Ruby.new(config, dirname)
     else
-      Agnostic.new(config)
+      Agnostic.new(config, dirname)
     end
   end
 
-  def initialize(config)
+  def initialize(config, dir='.')
+    @dir = dir
     @config = config
     config.each do |key, value|
       instance_variable_set("@#{key}", value)
@@ -30,7 +32,7 @@ class MSPRelease::Project
   end
 
   def source_package_name
-    debian_dir = File.dirname(changelog_path)
+    debian_dir = File.dirname(File.join(@dir, changelog_path))
     control_file = File.join(debian_dir + '/control')
     source_line = MSPRelease::Exec.exec("grep Source: #{control_file}")
     match = /^Source: (.+)$/.match(source_line)
@@ -38,7 +40,7 @@ class MSPRelease::Project
   end
 
   def changelog
-    Debian.new(".", changelog_path)
+    Debian.new(@dir, changelog_path)
   end
 
   # Produce the name of a release using the data that is created with

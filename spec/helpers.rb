@@ -81,6 +81,8 @@ shared_context "project_helpers" do
   def init_project(name, options)
     changelog_path = options.fetch(:changelog_path, "debian/changelog")
     control_path = 'debian/control'
+    rules_path = 'debian/rules'
+    compat_path = 'debian/compat'
     ruby_version_file = options.fetch(:ruby_version_file, "lib/#{name}/version.rb")
     status = options.fetch(:status, :Dev)
     version = options.fetch(:version, '0.0.1')
@@ -127,6 +129,21 @@ shared_context "project_helpers" do
 CHANGELOG
     end
 
+    File.open(File.join(@project_dir, rules_path), 'w') do |f|
+      f.puts("""
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+%:
+        dh $@
+""")
+    end
+
+    File.open(File.join(@project_dir, compat_path), 'w') do |f|
+      f.puts("""8
+""")
+    end
+
     File.open(File.join(@project_dir, control_path), 'w') do |f|
       f.puts("""
 Source: #{name}
@@ -146,8 +163,10 @@ Description: Core library
 """)
     end
 
+    FileUtils.chmod(0755, rules_path)
+
     in_project_dir('project') do
-      exec "git add .msp_project #{changelog_path} #{ruby_version_file} #{control_path}"
+      exec "git add .msp_project #{changelog_path} #{ruby_version_file} #{control_path} #{rules_path} #{compat_path}"
       exec "git commit -m 'initial commit'"
       exec "git push origin master:master"
     end
@@ -166,8 +185,8 @@ Description: Core library
 #{@build_extra}
 BASH
       end
-      FileUtils.chmod 0755, build_cmd
-      exec "git add #{build_cmd}"
+      FileUtils.chmod 0755, "bin/build-debs.sh"
+      exec "git add bin/build-debs.sh"
       exec "git commit -m 'build command'"
       exec "git push origin master:master"
     end

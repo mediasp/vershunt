@@ -24,6 +24,18 @@ describe "MSPRelease::Exec" do
     exec_output.string.should == ""
   end
 
+  it 'can mix output from stdout and stderr' do
+    script = <<SCRIPT
+$stdout.puts(\"cats\")
+$stdout.puts(\"dogs\")
+$stderr.puts(\"pigs\")
+$stdout.puts(\"llamas\")
+SCRIPT
+
+    exec("ruby -e '#{script}'")
+    exec_output.string.should == "pigs\ncats\ndogs\nllamas\n"
+  end
+
   it 'will prefix output with the name if given' do
     exec('echo hi', :name => 'test').should == "hi\n"
     exec_output.string.should == "test: hi\n"

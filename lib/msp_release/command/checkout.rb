@@ -12,6 +12,7 @@ module MSPRelease
     def run
       git_url = arguments[0]
       release_spec_arg = arguments[1]
+      do_build = switches.include?("--build")
 
       branch_name = release_spec_arg || 'master'
       pathspec = "origin/#{branch_name}"
@@ -48,26 +49,27 @@ module MSPRelease
 
           project.changelog.amend(dev_version)
         end
-
-        project.source_package_name + "-" + project.changelog.version.to_s
+        src_dir = project.source_package_name + "-" + project.changelog.version.to_s
       end
 
       FileUtils.mv(tmp_dir, src_dir)
+      project = Project.new_from_project_file(src_dir + "/" + Helpers::PROJECT_FILE)
       $stdout.puts("Checked out to #{src_dir}")
 
-      if switches.include?("--build")
+      if do_build
+        $stdout.puts("Building package...")
         build = Build.new(src_dir, project)
         begin
           result = build.perform!
-          changes_file = File.expand_path(result.changes_file)
-          $stdout.puts("Package built: #{changes_file}")
-        rescue Build::NoChangesFileError
+          $stdout.puts("Package built: #{result.changes_file}")
+        rescue Build::NoChangesFileError => e
           raise ExitException.new(
-            "Unable to find changes file with version: #{looking_for}" +
+            "Unable to find changes file with version: #{e.message}\n" +
             "Available: \n" +
-            available_changes_files.map { |f| "  #{f}" }.join("\n"))
+            build.available_changes_files.map { |f| "  #{f}" }.join("\n"))
         end
       end
+
     end
 
     private

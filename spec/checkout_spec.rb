@@ -7,7 +7,7 @@ describe 'checkout' do
 
     before do
       build_init_project('project', {:deb =>
-          {:build_command => "bin/build-debs.sh"}})
+          {:build_command => "dpkg-buildpackage -us -uc"}})
     end
 
     it 'lets you checkout the latest release from master when invoking with only the repository as a single argument' do
@@ -38,18 +38,17 @@ describe 'checkout' do
         run_msp_release "checkout --build #{@remote_repo}"
 
         last_run.should exit_with(0)
-        puts last_stdout
         last_stdout.should match("Checking out latest commit from master")
-        version_regex = "([0-9]{14}-git\+[a-f0-9]{6}~master)"
+        version_regex = "([0-9]{14}-git\\+[a-f0-9]{6}~master)"
 
         checked_out_regex = /Checked out to project\-#{version_regex}/
         last_stdout.should match(checked_out_regex)
         package_version = checked_out_regex.match(last_stdout)[1]
 
-        package_built_regex = /Package built: (project\-#{version_regex}_[a-z0-9]+.changes)/
+        package_built_regex = /Package built:.+(project\_#{version_regex}_[a-z0-9]+.changes)/
         last_stdout.should match(package_built_regex)
 
-        changes_fname = package_built_regex[1]
+        changes_fname = package_built_regex.match(last_stdout)[1]
         File.exists?(changes_fname).should be_true
       end
     end
@@ -58,7 +57,8 @@ describe 'checkout' do
   describe "checking out latest from a branch" do
 
     before do
-      project = init_project('project', {})
+      build_init_project('project', {:deb =>
+          {:build_command => "dpkg-buildpackage -us -uc"}})
 
       in_project_dir do
         run_msp_release 'branch'
@@ -68,7 +68,6 @@ describe 'checkout' do
     end
 
     it 'will checkout the lastest release on a branch if you pass BRANCH_NAME as an argument' do
-
       in_tmp_dir do
         run_msp_release "checkout #{@remote_repo} release-0.0.1"
 
@@ -86,18 +85,20 @@ describe 'checkout' do
     end
 
     it 'will build the package if you pass --build' do
-      run_msp_release "checkout --build #{@remote_repo} release-0.0.1"
+      in_tmp_dir do
+        run_msp_release "checkout --build #{@remote_repo} release-0.0.1"
 
-      last_run.should exit_with(0)
-      last_stdout.should match("Checking out latest release commit from origin/release-0.0.1")
-      last_stdout.should match("Checked out to project-0.0.1-1")
+        last_run.should exit_with(0)
+        last_stdout.should match("Checking out latest release commit from origin/release-0.0.1")
+        last_stdout.should match("Checked out to project-0.0.1-1")
 
 
-      package_built_regex = /Package built: (project-0\.0\.1-1_[a-z0-9]+\.changes)/
-      last_stdout.should match(package_built_regex)
+        package_built_regex = /Package built:.+(project_0\.0\.1\-1_[a-z0-9]+\.changes)/
+        last_stdout.should match(package_built_regex)
 
-      changes_fname = package_built_regex[1]
-      File.exists?(changes_fname).should be_true
+        changes_fname = package_built_regex.match(last_stdout)[1]
+        File.exists?(changes_fname).should be_true
+      end
     end
 
     it 'will fail if you give it a branch that does not exist' do

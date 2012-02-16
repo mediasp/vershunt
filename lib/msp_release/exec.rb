@@ -24,8 +24,6 @@ module MSPRelease
         # use the options we were constructed with if they exist
         if respond_to?(:options)
           options[:quiet] = !self.options.verbose? unless options.has_key? :quiet
-        else
-          puts "no options on #{self}"
         end
 
         if respond_to? :exec_name

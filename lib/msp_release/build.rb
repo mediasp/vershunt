@@ -11,7 +11,7 @@ module MSPRelease
 
     class NoChangesFileError < StandardError ; end
 
-    include Helpers
+    include Exec::Helpers
 
     def initialize(basedir, project)
       @basedir = basedir
@@ -19,12 +19,21 @@ module MSPRelease
     end
 
     def perform!
-      Dir.chdir(@basedir) do
-        exec build_command
+      dir = File.expand_path(@basedir)
+      raise "directory does not exist: #{dir}" unless
+        File.directory?(dir)
+
+      Dir.chdir(dir) do
+        exec(build_command)
       end
 
       looking_for = @project.changelog.version.to_s
       changes_file = find_changes_file(looking_for)
+      if changes_file && File.exists?(changes_file)
+        Result.new(changes_file)
+      else
+        raise NoChangesFileError, looking_for
+      end
     end
 
     def available_changes_files
@@ -32,17 +41,21 @@ module MSPRelease
     end
 
     def output_directory
-      File.expand_path(project.config[:deb_output_directory] ||
+      File.expand_path(@project.config[:deb_output_directory] ||
         File.join(@basedir, '..'))
     end
 
     private
 
     def build_command
-      @project.config[:deb_build_command] || 'dpkg-buildpackage'
+      if cmd = @project.config[:deb_build_command]
+        cmd
+      else
+        'dpkg-buildpackage'
+      end
     end
 
-    def changes_pattern(project)
+    def changes_pattern
       /#{@project.source_package_name}_([^_]+)_([^\.]+)\.changes/
     end
 
