@@ -16,11 +16,12 @@ module MSPRelease
 
       branch_name = release_spec_arg || 'master'
       pathspec = "origin/#{branch_name}"
+      branch_is_release_branch = !! /^release-.+$/.match(branch_name)
 
-      if release_spec_arg
+      if release_spec_arg && branch_is_release_branch
         puts("Checking out latest release commit from #{pathspec}")
       else
-        puts("Checking out latest commit from master")
+        puts("Checking out latest commit from #{pathspec}")
       end
 
       tmp_dir = "msp_release-#{Time.now.to_i}.tmp"
@@ -31,9 +32,10 @@ module MSPRelease
       src_dir = Dir.chdir(tmp_dir) do
 
         if pathspec != "origin/master"
-          # look for a release commit
           move_to(pathspec)
+        end
 
+        if branch_is_release_branch
           first_commit_hash, commit_message =
             find_first_release_commit(project)
 
@@ -42,7 +44,6 @@ module MSPRelease
           end
 
           exec "git reset --hard #{first_commit_hash}"
-
         else
           dev_version = Development.
             new_from_working_directory(branch_name, latest_commit_hash)

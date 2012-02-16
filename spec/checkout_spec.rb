@@ -3,6 +3,10 @@ require 'spec/helpers'
 describe 'checkout' do
   include_context 'project_helpers'
 
+  let :dev_version_regex do
+    "([0-9]{14}-git\\+[a-f0-9]{6}~([a-z\.]+))"
+  end
+
   describe "default behaviour - no args except repository url" do
 
     before do
@@ -16,7 +20,7 @@ describe 'checkout' do
         run_msp_release "checkout #{@remote_repo}"
 
         last_run.should exit_with(0)
-        last_stdout.should match("Checking out latest commit from master")
+        last_stdout.should match("Checking out latest commit from origin/master")
         version_regex = /Checked out to project\-([0-9]{14}-git\+[a-f0-9]{6}~master)/
         last_stdout.should match(version_regex)
 
@@ -38,14 +42,13 @@ describe 'checkout' do
         run_msp_release "checkout --build #{@remote_repo}"
 
         last_run.should exit_with(0)
-        last_stdout.should match("Checking out latest commit from master")
-        version_regex = "([0-9]{14}-git\\+[a-f0-9]{6}~master)"
+        last_stdout.should match("Checking out latest commit from origin/master")
 
-        checked_out_regex = /Checked out to project\-#{version_regex}/
+        checked_out_regex = /Checked out to project\-#{dev_version_regex}/
         last_stdout.should match(checked_out_regex)
         package_version = checked_out_regex.match(last_stdout)[1]
 
-        package_built_regex = /Package built:.+(project\_#{version_regex}_[a-z0-9]+.changes)/
+        package_built_regex = /Package built:.+(project\_#{dev_version_regex}_[a-z0-9]+.changes)/
         last_stdout.should match(package_built_regex)
 
         changes_fname = package_built_regex.match(last_stdout)[1]
@@ -54,7 +57,36 @@ describe 'checkout' do
     end
   end
 
-  describe "checking out latest from a branch" do
+  describe "checkout out HEAD from a non release branch" do
+
+    before do
+      build_init_project('project', {:deb =>
+          {:build_command => "dpkg-buildpackage -us -uc"}})
+
+      in_project_dir do
+        exec("git branch feature-llama")
+        exec("git push origin feature-llama")
+      end
+    end
+
+    it 'will checkout head from a branch if you pass BRANCH_NAME as an argument' do
+      in_tmp_dir do
+        run_msp_release "checkout #{@remote_repo} feature-llama"
+        last_run.should exit_with(0)
+        last_stdout.should match("Checking out latest commit from origin/feature-llama")
+
+        checked_out_regex = /Checked out to project\-#{dev_version_regex}/
+        last_stdout.should match(checked_out_regex)
+        package_version = checked_out_regex.match(last_stdout)[1]
+        branch_part = checked_out_regex.match(last_stdout)[2]
+
+        branch_part.should == 'feature.llama'
+      end
+    end
+
+  end
+
+  describe "checking out latest release commit from a release branch" do
 
     before do
       build_init_project('project', {:deb =>
