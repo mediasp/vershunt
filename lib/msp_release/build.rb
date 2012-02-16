@@ -23,8 +23,13 @@ module MSPRelease
       raise "directory does not exist: #{dir}" unless
         File.directory?(dir)
 
+      e = Exec.new(:name => 'build', :quiet => false, :status => :any)
       Dir.chdir(dir) do
-        exec(build_command)
+        e.exec(build_command)
+      end
+
+      if e.last_exitstatus != 0
+        $stderr.puts("Warning: #{build_command} exited with #{e.last_exitstatus}")
       end
 
       looking_for = @project.changelog.version.to_s

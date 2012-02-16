@@ -60,6 +60,10 @@ module MSPRelease
       @last_output
     end
 
+    def last_exitstatus
+      @last_exitstatus
+    end
+
     def exec(command, options={})
 
       expected = to_expected_array(options.fetch(:status, 0))
