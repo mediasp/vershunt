@@ -5,6 +5,9 @@ module MSPRelease
 
     include Debian::Versions
 
+    # When cloning repositories, limit to this many commits from each head
+    CLONE_DEPTH = 5
+
     def self.description
       "Checkout a release commit from a git repository"
     end
@@ -13,19 +16,22 @@ module MSPRelease
       git_url = arguments[0]
       release_spec_arg = arguments[1]
       do_build = switches.include?("--build")
+      clone_depth = switches.include?("--shallow") ? CLONE_DEPTH : nil
 
       branch_name = release_spec_arg || 'master'
       pathspec = "origin/#{branch_name}"
       branch_is_release_branch = !! /^release-.+$/.match(branch_name)
 
+      shallow_output = clone_depth.nil?? '' : ' (shallow)'
       if release_spec_arg && branch_is_release_branch
-        puts("Checking out latest release commit from #{pathspec}")
+        puts("Checking out latest release commit from #{pathspec}#{shallow_output}")
       else
-        puts("Checking out latest commit from #{pathspec}")
+        puts("Checking out latest commit from #{pathspec}#{shallow_output}")
       end
 
       tmp_dir = "msp_release-#{Time.now.to_i}.tmp"
-      Git.clone(git_url, {:out_to => tmp_dir, :exec => {:quiet => true}})
+      Git.clone(git_url, {:depth => clone_depth, :out_to => tmp_dir,
+          :exec => {:quiet => true}})
 
       project = Project.new_from_project_file(tmp_dir + "/" + Helpers::PROJECT_FILE)
 

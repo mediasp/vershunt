@@ -5,8 +5,9 @@ class MSPRelease::Git
     def clone(git_url, options={})
       out_to = options[:out_to]
       exec_options = options[:exec] || {}
+      depth_arg = options[:depth].nil?? '' : "--depth #{options[:depth]}"
       MSPRelease::Exec.
-        exec("git clone #{git_url} #{out_to.nil?? '' : out_to}", exec_options)
+        exec("git clone #{depth_arg} #{git_url} #{out_to.nil?? '' : out_to}", exec_options)
     end
   end
 

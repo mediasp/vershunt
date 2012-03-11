@@ -1,4 +1,6 @@
 require 'spec/helpers'
+require 'msp_release'
+require 'msp_release/command/checkout'
 
 describe 'checkout' do
   include_context 'project_helpers'
@@ -141,7 +143,49 @@ describe 'checkout' do
         last_stderr.should match("Git pathspec 'origin/release-0.1.0' does not exist")
       end
     end
-
-
   end
+
+  describe "with --shallow" do
+    before do
+      build_init_project('project', {:deb =>
+          {:build_command => "dpkg-buildpackage -us -uc"}})
+
+      in_project_dir do
+        # Create enough commits so that the first one will not show up in a
+        # shallow clone
+        (0..(MSPRelease::Command::Checkout::CLONE_DEPTH + 1)).each do |iter|
+          exec("echo change >> dummy_file")
+          exec("git add dummy_file")
+          exec("git commit -m 'change #{iter}'")
+
+        end
+        exec("git push origin master")
+      end
+    end
+
+    it "will checkout the repository with short history" do
+      in_tmp_dir do
+        run_msp_release "checkout --shallow file:///#{@remote_repo}"
+        last_run.should exit_with(0)
+        last_stdout.should match("^Checking out latest commit from origin/master \\(shallow\\)$")
+        version_regex = /Checked out to project\-([0-9]{14}-git\+[a-f0-9]{6}~master)/
+        last_stdout.should match(version_regex)
+
+        package_version = version_regex.match(last_stdout)[1]
+        full_package_name = 'project-' + package_version
+
+        File.directory?(full_package_name).should be_true
+        Dir.chdir full_package_name do
+          run_msp_release 'status'
+          last_run.should exit_with(0)
+          last_stdout.should include("Changelog says : #{package_version}")
+          exec("git log")
+          last_stdout.should match("change 6")
+          last_stdout.should_not match("change 0")
+        end
+      end
+
+    end
+  end
+
 end
