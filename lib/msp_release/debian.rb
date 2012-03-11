@@ -149,6 +149,14 @@ class Debian
     Versions::Unrecognized.new(version_string_from_top_line)
   end
 
+  def distribution_pattern
+    /([^ ]+ [^ ]+ )([^;]+)/
+  end
+
+  def distribution
+    (m = distribution_pattern.match(read_top_line)) && m[2]
+  end
+
   def package_name
     /[a-z\-]+/.match(read_top_line)
   end
@@ -165,11 +173,13 @@ class Debian
     self.version == version
   end
 
-  def amend(version, distribution=default_distribution)
+  def amend(version, distribution=self.distribution)
     # replace the first line
     tline, *all = File.open(@fname, 'r') {|f|f.readlines}
     cur_version = /^[^\(]+\(([^\)]+).+/.match(tline)[1]
-    tline = tline.gsub(cur_version, "#{version}")
+    tline = tline.gsub(cur_version, "#{version}").
+      gsub(distribution_pattern) {|m|"#{$1}#{distribution}" }
+
     all.unshift(tline)
 
     signoff_idx = all.index {|l| /^ -- .+$/.match(l) }
@@ -180,7 +190,7 @@ class Debian
     version
   end
 
-  def add(version, stub, distribution=default_distribution)
+  def add(version, stub, distribution=self.distribution)
     tline = create_top_line(version, distribution)
     all = File.open(@fname, 'r') {|f| f.readlines }
     new =

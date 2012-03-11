@@ -34,5 +34,12 @@ module MSPRelease
     end
 
     attr_accessor :options, :arguments, :switches
+
+    # FIXME put this in a helper module?
+    def distribution_from_switches
+      arg = switches.grep(/^--debian-distribution=/).last
+      arg && arg.match(/=(.+)$/)[1]
+    end
+
   end
 end

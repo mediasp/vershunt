@@ -38,6 +38,23 @@ describe 'checkout' do
       end
     end
 
+    it 'lets you change the distribution in the changelog' do
+      in_tmp_dir do
+        run_msp_release "checkout --debian-distribution=tinternet #{@remote_repo}"
+
+        last_run.should exit_with(0)
+        last_stdout.should match("Checking out latest commit from origin/master")
+
+        checked_out_regex = /Checked out to project\-#{dev_version_regex}/
+        last_stdout.should match(checked_out_regex)
+        package_version = checked_out_regex.match(last_stdout)[1]
+
+        File.read("project-#{package_version}/debian/changelog").
+          first.strip.should ==
+          "project (#{package_version}) tinternet; urgency=low"
+      end
+    end
+
     it 'lets you checkout the latest from master and the builds it' do
 
       in_tmp_dir do

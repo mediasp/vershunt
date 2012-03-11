@@ -57,6 +57,36 @@ describe 'creating and pushing releases' do
         last_stdout.should include('Changelog now at 0.0.1-2')
       end
     end
+
+    it 'lets you change the target distribution using --debian-distribution=' do
+      in_project_dir do |dir|
+        run_msp_release 'branch'
+        last_run.should exit_with(0)
+
+        run_msp_release 'new --debian-distribution=fakedist'
+
+        last_run.should exit_with(0)
+        last_stdout.should include("Changelog now at 0.0.1-1\n")
+
+        File.read('debian/changelog').first.strip.should ==
+          "project (0.0.1-1) fakedist; urgency=low"
+      end
+    end
+
+    it 'respects any previous change to the distribution' do
+      in_project_dir do |dir|
+        run_msp_release 'branch'
+        last_run.should exit_with(0)
+
+        run_msp_release 'new --debian-distribution=fakedist'
+        run_msp_release 'push'
+        run_msp_release 'new'
+
+        last_stdout.should include("Changelog now at 0.0.1-2\n")
+        File.read('debian/changelog').first.strip.should ==
+          "project (0.0.1-2) fakedist; urgency=low"
+      end
+    end
   end
 
   describe "new releases with ruby != debian version" do

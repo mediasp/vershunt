@@ -13,6 +13,7 @@ class MSPRelease::Command::New < MSPRelease::Command
 
     deb_version = changelog.version
     project_version = project.version
+    distribution = distribution_from_switches || changelog.distribution
 
     new_version =
       if deb_version.to_version != project_version
@@ -23,7 +24,7 @@ class MSPRelease::Command::New < MSPRelease::Command
       end
 
     puts "Adding new entry to changelog..."
-    changelog.add(new_version, "New release")
+    changelog.add(new_version, "New release", distribution)
 
     self.data = {:version => new_version}
     save_data

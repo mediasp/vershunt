@@ -34,6 +34,7 @@ module MSPRelease
           :exec => {:quiet => true}})
 
       project = Project.new_from_project_file(tmp_dir + "/" + Helpers::PROJECT_FILE)
+      distribution = distribution_from_switches || project.changelog.distribution
 
       src_dir = Dir.chdir(tmp_dir) do
 
@@ -54,7 +55,7 @@ module MSPRelease
           dev_version = Development.
             new_from_working_directory(branch_name, latest_commit_hash)
 
-          project.changelog.amend(dev_version)
+          project.changelog.amend(dev_version, distribution)
         end
         src_dir = project.source_package_name + "-" + project.changelog.version.to_s
       end
