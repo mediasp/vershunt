@@ -76,6 +76,7 @@ describe 'bump' do
       run_msp_release 'status'
       last_run.should exit_with(0)
       last_stdout.should match(/Project says +: +#{Regexp.escape(string)}/)
+      last_stdout.should match(/Changelog says +: +#{Regexp.escape(string)}/)
     end
 
     before do

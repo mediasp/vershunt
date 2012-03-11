@@ -8,7 +8,7 @@ class MSPRelease::Project
       debian_version = Debian::Versions::Unreleased.new_from_version(new_version)
       changelog.add(debian_version, "New version")
 
-      changelog.fname
+      [changelog.fname]
     end
 
     def version

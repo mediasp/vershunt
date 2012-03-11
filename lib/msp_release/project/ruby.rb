@@ -11,11 +11,11 @@ class MSPRelease::Project
       /VERSION = '([0-9]+)\.([0-9]+)\.([0-9]+)'/
     end
 
-    def write_version(version)
+    def write_version(new_version)
       lines = File.open(ruby_version_file, 'r')  { |f| f.readlines }
       lines = lines.map do |line|
         if match = version_pattern.match(line)
-          line.gsub(/( *VERSION = )'.+'$/, "\\1'#{version.to_s}'")
+          line.gsub(/( *VERSION = )'.+'$/, "\\1'#{new_version.to_s}'")
         else
           line
         end
@@ -23,7 +23,10 @@ class MSPRelease::Project
 
       File.open(ruby_version_file, 'w')  { |f| f.write(lines) }
 
-      ruby_version_file
+      debian_version = Debian::Versions::Unreleased.new_from_version(new_version)
+      changelog.add(debian_version, "New version")
+
+      [changelog.fname, ruby_version_file]
     end
 
     def version

@@ -84,8 +84,8 @@ class MSPRelease::Project
 
   def bump_version(segment)
     new_version = version.bump(segment.to_sym)
-    written_file = write_version(new_version)
-    [new_version, written_file]
+    written_files = write_version(new_version)
+    [new_version, *written_files]
   end
 
 end
