@@ -1,3 +1,9 @@
+msp-release (1.1.0) msp; urgency=low
+
+  * New version
+
+ -- Nick Griffiths <nicobrevin@gmail.com>  Sun, 11 Mar 2012 21:46:35 +0000
+
 msp-release (1.0.0) msp; urgency=low
 
   * New major version with new style versioning and support for building from source
