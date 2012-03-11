@@ -86,6 +86,7 @@ shared_context "project_helpers" do
     ruby_version_file = options.fetch(:ruby_version_file, "lib/#{name}/version.rb")
     status = options.fetch(:status, :Dev)
     version = options.fetch(:version, '0.0.1')
+    changelog_version = options[:changelog_version] || version
 
     create_project_dir(name)
     @remote_repo = File.expand_path(@project_dir + "/../#{name}-remote.git")
@@ -120,7 +121,7 @@ shared_context "project_helpers" do
 
     write_project_file changelog_path do |f|
       f.puts <<CHANGELOG
-#{name} (#{version}) unstable; urgency=low
+#{name} (#{changelog_version}) unstable; urgency=low
 
   * First release
 

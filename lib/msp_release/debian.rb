@@ -102,7 +102,27 @@ class Debian
       def to_s
         "#{@timestamp}-git+#{@hash}~#{@branch_name}"
       end
+
+      def bump
+        Stable.new(@major, @minor, @bugfix, "1")
+      end
     end
+
+    class Unrecognized < Base
+
+      def self.pattern
+        /^(.+)$/
+      end
+
+      def initialize(chunk)
+        @chunk = chunk
+      end
+
+      def to_s       ; @chunk ; end
+      def to_version ; nil    ; end
+    end
+
+
   end
 
   def default_distribution ; "msp" ; end
@@ -126,6 +146,7 @@ class Debian
       v = c.new_if_matches(version_string_from_top_line) and
         return v
     end
+    Versions::Unrecognized.new(version_string_from_top_line)
   end
 
   def package_name
@@ -175,6 +196,10 @@ class Debian
     File.open(@fname, 'w') {|f| f.write(new.join("\n")); f.write(all.join) }
 
     version
+  end
+
+  def reset_at(project_version)
+    Versions::Unreleased.new_from_version(project_version).bump
   end
 
   def create_signoff

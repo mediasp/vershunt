@@ -12,9 +12,15 @@ class MSPRelease::Command::New < MSPRelease::Command
     fail_unless_on_release_branch
 
     deb_version = changelog.version
-    project_version = project.any_version
+    project_version = project.version
 
-    new_version = deb_version.bump
+    new_version =
+      if deb_version.to_version != project_version
+        $stderr.puts("Warning: project version (#{project_version.to_s}) did not match changelog version (#{deb_version.to_s}), project version wins")
+        changelog.reset_at(project_version)
+      else
+        deb_version.bump
+      end
 
     puts "Adding new entry to changelog..."
     changelog.add(new_version, "New release")

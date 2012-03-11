@@ -69,6 +69,7 @@ class MSPRelease::Project
     any_version == rhs_version
   end
 
+  # TODO pretty sure we can kill this method now
   def any_version
     version || changelog.version
   end
