@@ -55,6 +55,27 @@ describe 'checkout' do
       end
     end
 
+    it 'lets you put the build products in to a tar file' do
+      in_tmp_dir do
+        run_msp_release "checkout --build --tar #{@remote_repo}"
+
+        last_run.should exit_with(0)
+        last_stdout.should match("Checking out latest commit from origin/master")
+
+        checked_out_regex = /Checked out to project\-#{dev_version_regex}/
+        last_stdout.should match(checked_out_regex)
+        package_version = checked_out_regex.match(last_stdout)[1]
+        puts last_stdout
+        tarfile = "project-#{package_version}.tar"
+        File.exists?(tarfile).should be_true
+
+        exec("tar -tf #{tarfile}")
+        ["\.changes$", "\.dsc$", "\.tar\.gz$", "\.deb$"].each do |pattern|
+          last_stdout.should match(pattern)
+        end
+      end
+    end
+
     it 'lets you checkout the latest from master and the builds it' do
 
       in_tmp_dir do

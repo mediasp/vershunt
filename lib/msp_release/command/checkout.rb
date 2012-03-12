@@ -16,6 +16,7 @@ module MSPRelease
       git_url = arguments[0]
       release_spec_arg = arguments[1]
       do_build = switches.include?("--build")
+      tar_it = switches.include?("--tar")
       clone_depth = switches.include?("--shallow") ? CLONE_DEPTH : nil
 
       branch_name = release_spec_arg || 'master'
@@ -67,20 +68,34 @@ module MSPRelease
       if do_build
         $stdout.puts("Building package...")
         build = Build.new(src_dir, project)
-        begin
-          result = build.perform!
-          $stdout.puts("Package built: #{result.changes_file}")
-        rescue Build::NoChangesFileError => e
-          raise ExitException.new(
+
+        result =
+          begin
+            result = build.perform!
+          rescue Build::NoChangesFileError => e
+            raise ExitException.new(
             "Unable to find changes file with version: #{e.message}\n" +
             "Available: \n" +
             build.available_changes_files.map { |f| "  #{f}" }.join("\n"))
-        end
-      end
+          end
 
+        $stdout.puts("Package built: #{result.changes_file}")
+        tar_it_up(project, result) if tar_it
+      end
     end
 
     private
+
+    def tar_it_up(project, result)
+      changes = File.read(result.changes_file).split("\n")
+      files_start = changes.index {|l| /^Files: $/.match(l) } + 1
+      files = changes[files_start..-1].map {|l| l.split(" ").last } +
+        [result.changes_file]
+
+      tarfile = "#{project.source_package_name}-#{project.changelog.version}.tar"
+      exec("tar -cf #{tarfile} #{files.join(' ')}")
+      $stdout.puts("Build products archived in to #{tarfile}")
+    end
 
     def oneline_pattern
       /^([a-z0-9]+) (.+)$/i
