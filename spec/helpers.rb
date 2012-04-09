@@ -217,9 +217,11 @@ BASH
     end
   end
 
-  def in_tmp_dir(&block)
+  def in_tmp_dir(sub_dir=nil, &block)
     Dir.mktmpdir do |tmpdir|
-      Dir.chdir(tmpdir, &block)
+      change_to = [tmpdir, sub_dir].compact.join('/')
+      FileUtils.mkdir_p(change_to) unless File.exists?(change_to)
+      Dir.chdir(change_to, &block)
     end
   end
 end

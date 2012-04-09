@@ -66,7 +66,7 @@ module MSPRelease
 
     def find_changes_file(version_string)
       available_changes_files.find { |fname|
-        (m = changes_pattern.match(fname)) && m && (m[1] == version_string)
+        (m = changes_pattern.match(File.basename(fname))) && m && (m[1] == version_string)
       }
     end
 
