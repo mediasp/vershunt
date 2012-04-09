@@ -95,6 +95,28 @@ describe 'checkout' do
         File.exists?(changes_fname).should be_true
       end
     end
+
+    describe "in a working directory containing {project_name}_" do
+      it 'lets you checkout the latest from master and the builds it' do
+
+        in_tmp_dir 'project_builddir'  do
+          run_msp_release "checkout --build #{@remote_repo}"
+
+          last_run.should exit_with(0)
+          last_stdout.should match("Checking out latest commit from origin/master")
+
+          checked_out_regex = /Checked out to project\-#{dev_version_regex}/
+          last_stdout.should match(checked_out_regex)
+          package_version = checked_out_regex.match(last_stdout)[1]
+
+          package_built_regex = /Package built:.+(project\_#{dev_version_regex}_[a-z0-9]+.changes)/
+          last_stdout.should match(package_built_regex)
+
+          changes_fname = package_built_regex.match(last_stdout)[1]
+          File.exists?(changes_fname).should be_true
+        end
+      end
+    end
   end
 
   describe "checkout out HEAD from a non release branch" do
