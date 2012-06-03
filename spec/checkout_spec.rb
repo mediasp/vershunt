@@ -65,7 +65,6 @@ describe 'checkout' do
         checked_out_regex = /Checked out to project\-#{dev_version_regex}/
         last_stdout.should match(checked_out_regex)
         package_version = checked_out_regex.match(last_stdout)[1]
-        puts last_stdout
         tarfile = "project-#{package_version}.tar"
         File.exists?(tarfile).should be_true
 
