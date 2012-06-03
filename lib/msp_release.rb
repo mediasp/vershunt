@@ -111,6 +111,7 @@ module MSPRelease
   require 'msp_release/options'
   require 'msp_release/project'
   require 'msp_release/build'
+  require 'msp_release/make_branch'
   require 'msp_release/command'
 
 

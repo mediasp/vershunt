@@ -16,13 +16,13 @@ class MSPRelease::Command::Branch < MSPRelease::Command
 
     version = project.any_version
 
-    branch_name = "release-#{version.format}"
+    branch_name = project.branch_name(version)
 
-    if git.branch_exists?(branch_name)
-      puts "A branch for #{version} already exists"
-      exit 1
+    begin
+      MSPRelease::MakeBranch.new(git, branch_name).
+        perform!
+    rescue MSPRelease::MakeBranch::BranchExistsError => e
+      raise MSPRelease::ExitException, "A branch already exists for #{version}"
     end
-
-    git.create_and_switch(branch_name)
   end
 end
