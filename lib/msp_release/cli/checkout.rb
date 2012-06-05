@@ -11,6 +11,10 @@ module MSPRelease
       "Checkout a release commit from a git repository"
     end
 
+    cli_argument :git_url, "URL used to clone the git repository"
+    cli_argument :branch_name, "Name of a branch on master to switch to once checked out",
+      :required => false
+
     cli_option :build, "Build a debian package immediately after checking " +
       "out, using the dpkg-buildpackage command",
     {
@@ -41,8 +45,8 @@ module MSPRelease
     }
 
     def run
-      git_url          = arguments[0]
-      release_spec_arg = arguments[1]
+      git_url          = arguments[:git_url]
+      release_spec_arg = arguments[:branch_name]
 
       do_build         = options[:build]
       tar_it           = options[:tar]
