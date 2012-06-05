@@ -28,6 +28,8 @@ module MSPRelease
       rescue MSPRelease::MakeBranch::BranchExistsError => e
         raise MSPRelease::ExitException, "A branch already exists for #{version}"
       end
+
+      $stdout.puts("Switched to release branch '#{branch_name}'")
     end
 
     def check_branching_ok!
@@ -55,6 +57,7 @@ module MSPRelease
       exec "git commit -m 'BUMPED VERSION TO #{new_version}'"
 
       begin
+        $stdout.puts "Bumping master to #{new_version}, pushing to origin..."
         exec "git push origin master"
       rescue
         $stderr.puts "error pushing bump commit to master, undoing bump..."

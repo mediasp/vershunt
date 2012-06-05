@@ -17,6 +17,8 @@ describe 'branch' do
       in_project_dir do
         run_msp_release 'branch'
         last_run.should exit_with(0)
+        last_stdout.should match('Bumping master to 0.2.0, pushing to origin...')
+        last_stdout.should match("Switched to release branch 'release-0.1.0'")
         release_branch_should_match('0.1.0')
 
         exec "git checkout master"
