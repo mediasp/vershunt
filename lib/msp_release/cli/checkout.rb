@@ -2,7 +2,6 @@ require 'fileutils'
 
 module MSPRelease
   class CLI::Checkout < CLI::Command
-
     include Debian::Versions
 
     # When cloning repositories, limit to this many commits from each head
@@ -12,12 +11,42 @@ module MSPRelease
       "Checkout a release commit from a git repository"
     end
 
+    cli_option :build, "Build a debian package immediately after checking " +
+      "out, using the dpkg-buildpackage command",
+    {
+      :short   => 'b',
+      :default => false
+    }
+
+    cli_option :tar, "Create a tarfile containing all the debian build " +
+      "products when using --build",
+    {
+      :short   => 't',
+      :default => false
+    }
+
+    cli_option :shallow, "Only perform a shallow checkout to a depth of five" +
+      "commits from each head.  See git documentation for more details",
+    {
+      :short   => 's',
+      :default => false
+    }
+
+    cli_option :distribution, "Specify the debian distribution to put in the " +
+      "changelog when checking out a development version",
+    {
+      :short => 'd',
+      :long  => 'debian-distribution',
+      :type  => :string
+    }
+
     def run
-      git_url = arguments[0]
+      git_url          = arguments[0]
       release_spec_arg = arguments[1]
-      do_build = switches.include?("--build")
-      tar_it = switches.include?("--tar")
-      clone_depth = switches.include?("--shallow") ? CLONE_DEPTH : nil
+
+      do_build         = options[:build]
+      tar_it           = options[:tar]
+      clone_depth      = options[:shallow] ? CLONE_DEPTH : nil
 
       branch_name = release_spec_arg || 'master'
       pathspec = "origin/#{branch_name}"
@@ -35,7 +64,7 @@ module MSPRelease
           :exec => {:quiet => true}})
 
       project = Project.new_from_project_file(tmp_dir + "/" + Helpers::PROJECT_FILE)
-      distribution = distribution_from_switches || project.changelog.distribution
+      distribution = options[:distribution] || project.changelog.distribution
 
       src_dir = Dir.chdir(tmp_dir) do
 

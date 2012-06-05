@@ -1,27 +1,8 @@
 module MSPRelease
   module CLI
 
-    # Base class for command line operations
-    class Command
-      include Exec::Helpers
-
-      def initialize(options, arguments)
-        @options = options
-        @arguments, @switches = extract_args(arguments)
-      end
-
-      def extract_args(arguments)
-        arguments.partition {|a| /^[^\-]/.match(a) }
-      end
-
-      attr_accessor :options, :arguments, :switches
-
-      # FIXME put this in a helper module?
-      def distribution_from_switches
-        arg = switches.grep(/^--debian-distribution=/).last
-        arg && arg.match(/=(.+)$/)[1]
-      end
-    end
+    require 'trollop'
+    require 'msp_release/cli/command'
 
     # Commands that require a git working copy can include this module
     module WorkingCopyCommand
@@ -46,10 +27,12 @@ module MSPRelease
     end
 
     # hardcoded list of commands
-    COMMANDS = ['new', 'push', 'branch', 'status', 'reset', 'bump', 'build', 'distrib', 'checkout']
+    COMMANDS = ['help', 'new', 'push', 'branch', 'status', 'reset', 'bump', 'build', 'distrib', 'checkout']
 
     # These are available on the CLI module
     module ClassMethods
+
+      attr_reader :commands
 
       def extract_global_args(args)
         command_index = args.index {|a| /^[^\-]/.match(a) } || 0
@@ -66,8 +49,8 @@ module MSPRelease
 
         unless cmd
           $stderr.puts("Unknown command: #{cmd_name}")
-          print_help
-          exit 1
+          cmd = @commands['help']
+          command_args = []
         end
 
         begin
@@ -90,15 +73,6 @@ module MSPRelease
           camel_name =
             name.split(/[^a-z0-9]/i).map{|w| w.capitalize}.join
           @commands[name] = MSPRelease::CLI.const_get(camel_name)
-        end
-      end
-
-      def print_help
-        puts "Usage: msp_release COMMAND [OPTIONS]"
-        puts ""
-        puts "Available commands:"
-        COMMANDS.each do |cmd_name|
-          puts "  #{cmd_name.ljust(8)} #{@commands[cmd_name].description}"
         end
       end
     end

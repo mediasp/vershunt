@@ -7,6 +7,14 @@ module MSPRelease
       "Prepare master or a release branch for a release push"
     end
 
+    cli_option :distribution, "Specify a new debian distribution to put in the " +
+      "changelog for this new version",
+    {
+      :short => 'd',
+      :long  => 'debian-distribution',
+      :type  => :string
+    }
+
     def run
       fail_if_push_pending
       fail_if_modified_wc
@@ -14,7 +22,7 @@ module MSPRelease
 
       deb_version = changelog.version
       project_version = project.version
-      distribution = distribution_from_switches || changelog.distribution
+      distribution = options[:distribution] || changelog.distribution
 
       new_version =
         if deb_version.to_version != project_version

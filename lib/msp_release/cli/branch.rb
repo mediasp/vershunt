@@ -1,11 +1,29 @@
 module MSPRelease
   class CLI::Branch < CLI::Command
-
     include CLI::WorkingCopyCommand
 
     def self.description
-      "Create a release branch for MSP::VERSION"
+      "Create and switch to a release branch for the version on HEAD"
     end
+
+    cli_option :allow_non_master_branch, "Allow release branch to be created " +
+      "even if you are not on master.  Normally you would not want to do" +
+      " this, so this is here to prevent branches from mistakenly being " +
+      "created from branches other than master",
+    {
+      :short => 'a',
+      :default => false
+    }
+
+
+    cli_option :no_bump_master, "Do not bump the minor version of master " +
+      "as part of creating the release branch.  Typically after creating a " +
+      "release branch, the minor version being stabilised now lives on the " +
+      "branch and master is now a new version",
+    {
+      :short => 'n',
+      :default => false
+    }
 
     def run
       fail_if_push_pending
@@ -33,7 +51,7 @@ module MSPRelease
     end
 
     def check_branching_ok!
-      if switches.include? '--allow-non-master-branch'
+      if options[:allow_non_master_branch]
         $stderr.puts("Creating a non-master release branch, --allow-non-master-branch supplied")
         "HEAD@{0}"
       else
@@ -44,7 +62,7 @@ module MSPRelease
 
     def bump_and_push_master
 
-      return "HEAD@{0}" if switches.include?('--no-bump-master')
+      return "HEAD@{0}" if options[:no_bump_master]
 
       # don't let this happen with a dirty working copy, because we reset the
       # master branch, which will kill all your changes

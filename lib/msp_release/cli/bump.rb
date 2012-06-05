@@ -7,6 +7,20 @@ module MSPRelease
       "Increase the version number of the project"
     end
 
+    cli_option :force, "Force bumping of version segments other than bugfix " +
+      "if you are not on master.  By default, you bump minor and major from" +
+      " master, and you bump the bugfix version while on a branch.",
+    {
+      :short => 'f',
+      :default => false
+    }
+
+    cli_option :no_branch, "Do not create and switch to a new release branch " +
+      "before bumping the minor version on an existing release branch.", {
+      :short => 'n',
+      :default => false
+    }
+
     def run
       segment = arguments.last
 
@@ -24,7 +38,7 @@ module MSPRelease
     end
 
     def check_bump_allowed!(segment)
-      force = switches.include?('--force')
+      force = options[:force]
       not_on_master = !git.on_master?
 
       if not_on_master && segment != 'bugfix' && ! force
@@ -35,7 +49,7 @@ module MSPRelease
     end
 
     def perform_branch_if_bump_bugfix(segment, new_version, changed_files)
-      do_branch = ! switches.include?('--no-branch')
+      do_branch = ! options[:no_branch]
       on_branch = on_release_branch?
 
       if on_branch && segment == 'bugfix' && do_branch
