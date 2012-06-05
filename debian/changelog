@@ -1,3 +1,9 @@
+msp-release (1.3.0) msp; urgency=low
+
+  * New version
+
+ -- Nick Griffiths <nicobrevin@gmail.com>  Tue, 05 Jun 2012 19:48:13 +0100
+
 msp-release (1.2.1) msp; urgency=low
 
   * New version
