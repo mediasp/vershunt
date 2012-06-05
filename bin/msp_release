@@ -15,4 +15,4 @@ lib_dir =
 $LOAD_PATH.unshift(lib_dir)
 
 require 'msp_release'
-MSPRelease.run(ARGV)
+MSPRelease::CLI.run(ARGV)
