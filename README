@@ -1,1 +1,5 @@
-MSP Release management system
+# MSP Release management system
+
+Manipulates your git repository to create commits and perform branch management
+to create a consistent log of commits to be used as part of a repeatable build
+system, as well as encouraging semantic versioning (see http://semver.org)
