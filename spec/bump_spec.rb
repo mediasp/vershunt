@@ -123,21 +123,9 @@ describe 'bump' do
 
   include_context 'project_helpers'
 
-  def release_branch_should_match(string)
-    run_msp_release 'status'
-    last_run.should exit_with(0)
-    last_stdout.should match(/Release branch +: +#{Regexp.escape(string)}/)
-  end
-
   describe 'on a changelog only project' do
 
     include_examples 'bump operations'
-
-    def project_version_should_match(string)
-      run_msp_release 'status'
-      last_run.should exit_with(0)
-      last_stdout.should match(/Changelog says +: +#{Regexp.escape(string)}/)
-    end
 
     before do
       init_project('project', {:ruby_version_file => nil})

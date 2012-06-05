@@ -224,6 +224,19 @@ BASH
       Dir.chdir(change_to, &block)
     end
   end
+
+  def release_branch_should_match(string)
+    run_msp_release 'status'
+    last_run.should exit_with(0)
+    last_stdout.should match(/Release branch +: +#{Regexp.escape(string)}/)
+  end
+
+  def project_version_should_match(string)
+    run_msp_release 'status'
+    last_run.should exit_with(0)
+    last_stdout.should match(/Changelog says +: +#{Regexp.escape(string)}/)
+  end
+
 end
 
 RSpec.configure do |config|

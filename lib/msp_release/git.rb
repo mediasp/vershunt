@@ -61,8 +61,9 @@ class MSPRelease::Git
     $? == 0
   end
 
-  def create_and_switch(branch_name)
-    exec "git branch #{branch_name}"
+  def create_and_switch(branch_name, options={})
+    start_point = options[:start_point]
+    exec "git branch #{branch_name} #{start_point}"
     exec "git push origin #{branch_name}"
     exec "git checkout #{branch_name}"
   end
