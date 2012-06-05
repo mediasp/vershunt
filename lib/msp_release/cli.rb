@@ -52,7 +52,7 @@ module MSPRelease
     module ClassMethods
 
       def extract_global_args(args)
-        command_index = args.index {|a| /^[^\-]/.match(a) }
+        command_index = args.index {|a| /^[^\-]/.match(a) } || 0
         [args[0...command_index], args[command_index], args[command_index+1..-1]]
       end
 
