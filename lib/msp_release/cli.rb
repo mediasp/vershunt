@@ -1,6 +1,27 @@
 module MSPRelease
   class CLI
 
+    class Command
+      include Exec::Helpers
+
+      def initialize(options, arguments)
+        @options = options
+        @arguments, @switches = extract_args(arguments)
+      end
+
+      def extract_args(arguments)
+        arguments.partition {|a| /^[^\-]/.match(a) }
+      end
+
+      attr_accessor :options, :arguments, :switches
+
+      # FIXME put this in a helper module?
+      def distribution_from_switches
+        arg = switches.grep(/^--debian-distribution=/).last
+        arg && arg.match(/=(.+)$/)[1]
+      end
+    end
+
     module WorkingCopyCommand
 
       include Helpers
@@ -21,25 +42,5 @@ module MSPRelease
       end
 
     end
-
-    include Exec::Helpers
-
-    def initialize(options, arguments)
-      @options = options
-      @arguments, @switches = extract_args(arguments)
-    end
-
-    def extract_args(arguments)
-      arguments.partition {|a| /^[^\-]/.match(a) }
-    end
-
-    attr_accessor :options, :arguments, :switches
-
-    # FIXME put this in a helper module?
-    def distribution_from_switches
-      arg = switches.grep(/^--debian-distribution=/).last
-      arg && arg.match(/=(.+)$/)[1]
-    end
-
   end
 end
