@@ -1,4 +1,4 @@
-class MSPRelease::Command::Bump < MSPRelease::Command
+class MSPRelease::CLI::Bump < MSPRelease::CLI
 
   include WorkingCopyCommand
 

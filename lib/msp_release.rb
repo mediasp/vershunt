@@ -112,7 +112,7 @@ module MSPRelease
   require 'msp_release/project'
   require 'msp_release/build'
   require 'msp_release/make_branch'
-  require 'msp_release/command'
+  require 'msp_release/cli'
 
 
   MSP_VERSION_FILE = "lib/msp/version.rb"
@@ -189,10 +189,10 @@ module MSPRelease
   def init_commands
     @commands = {}
     COMMANDS.each do |name|
-      require "msp_release/command/#{name}"
+      require "msp_release/cli/#{name}"
       camel_name =
         name.split(/[^a-z0-9]/i).map{|w| w.capitalize}.join
-      @commands[name] = MSPRelease::Command.const_get(camel_name)
+      @commands[name] = MSPRelease::CLI.const_get(camel_name)
     end
   end
 

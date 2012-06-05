@@ -1,4 +1,4 @@
-class MSPRelease::Command::Branch < MSPRelease::Command
+class MSPRelease::CLI::Branch < MSPRelease::CLI
 
   include WorkingCopyCommand
 

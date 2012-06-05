@@ -1,5 +1,5 @@
 module MSPRelease
-  class Command
+  class CLI
 
     module WorkingCopyCommand
 

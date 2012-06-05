@@ -1,4 +1,4 @@
-class MSPRelease::Command::Push < MSPRelease::Command
+class MSPRelease::CLI::Push < MSPRelease::CLI
 
   include WorkingCopyCommand
 

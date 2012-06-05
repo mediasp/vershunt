@@ -1,4 +1,4 @@
-class MSPRelease::Command::Reset < MSPRelease::Command
+class MSPRelease::CLI::Reset < MSPRelease::CLI
 
   include WorkingCopyCommand
 

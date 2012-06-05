@@ -1,6 +1,6 @@
 require 'spec/helpers'
 require 'msp_release'
-require 'msp_release/command/checkout'
+require 'msp_release/cli/checkout'
 
 describe 'checkout' do
   include_context 'project_helpers'
@@ -212,7 +212,7 @@ describe 'checkout' do
       in_project_dir do
         # Create enough commits so that the first one will not show up in a
         # shallow clone
-        (0..(MSPRelease::Command::Checkout::CLONE_DEPTH + 1)).each do |iter|
+        (0..(MSPRelease::CLI::Checkout::CLONE_DEPTH + 1)).each do |iter|
           exec("echo change >> dummy_file")
           exec("git add dummy_file")
           exec("git commit -m 'change #{iter}'")

@@ -1,7 +1,7 @@
 require 'fileutils'
 
 module MSPRelease
-  class Command::Checkout < MSPRelease::Command
+  class CLI::Checkout < MSPRelease::CLI
 
     include Debian::Versions
 
