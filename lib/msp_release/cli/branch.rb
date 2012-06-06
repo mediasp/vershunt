@@ -6,6 +6,16 @@ module MSPRelease
       "Create and switch to a release branch for the version on HEAD"
     end
 
+    def self.help
+      <<-HELP
+Create a release branch suitable for creating release commits.  The release branch will
+be named after the project version returned by `msp_release status`, so if the version is
+1.2.3, a branch of release-1.2.3 will be created.
+
+The minor version on master is bumped after the branch is created.
+HELP
+    end
+
     cli_option :allow_non_master_branch, "Allow release branch to be created " +
       "even if you are not on master.  Normally you would not want to do" +
       " this, so this is here to prevent branches from mistakenly being " +

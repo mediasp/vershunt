@@ -25,6 +25,12 @@ module MSPRelease
       trollop_parser = cmd_class.trollop_parser
       puts cmd_class.usage_line
       puts ""
+
+      if cmd_class.respond_to?(:help)
+        puts wrap cmd_class.help
+        puts ""
+      end
+
       trollop_parser.educate($stdout)
     end
 
@@ -54,19 +60,39 @@ STR
       puts "run msp_release help COMMAND for help on a specific command"
     end
 
+    # stolen from trollop
+    def width #:nodoc:
+      @width ||= if $stdout.tty?
+                  begin
+                     require 'curses'
+                     Curses::init_screen
+                     x = Curses::cols
+                     Curses::close_screen
+                     x
+                   rescue Exception
+                     80
+                   end
+                 else
+                   80
+                 end
+    end
+
     def wrap(string)
-      width = (ENV['COLUMNS'] || 80).to_i
-      words = string.split(" ")
 
-      words[1..-1].inject([words.first]) { |m, v|
-        new_last_line = m.last + " " + v
+      string.split("\n\n").map { |para|
 
-        if new_last_line.length <= width
-          m[0...-1] + [new_last_line]
-        else
-          m + [v]
-        end
-      }.join("\n")
+        words = para.split(/[\n ]/)
+        words[1..-1].inject([words.first]) { |m, v|
+          new_last_line = m.last + " " + v
+
+          if new_last_line.length <= width
+            m[0...-1] + [new_last_line]
+          else
+            m + [v]
+          end
+        }.join("\n")
+
+      }.join("\n\n")
     end
   end
 end

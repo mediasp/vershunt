@@ -11,6 +11,17 @@ module MSPRelease
       "Checkout a specific commit from a git repository suitable for building"
     end
 
+    def self.help
+      <<-HELP
+Checks out either the latest commit or latest latest release commit ready for building.  When no BRANCH_NAME
+is given, or that branch is not a release branch, the latest commit is checked out and the changelog
+version is adjusted to signify this will be a development build.
+
+If BRANCH_NAME denotes a release branch (i.e release-1.0.2) then the latest /release/ commit is checked out, even if there are commits after it.
+The changelog remains unaltered in this case - the release commit would have updated all version information.
+HELP
+    end
+
     cli_argument :git_url, "URL used to clone the git repository"
     cli_argument :branch_name, "Name of a branch on master to switch to once checked out",
       :required => false
