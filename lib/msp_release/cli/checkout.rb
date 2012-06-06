@@ -8,7 +8,7 @@ module MSPRelease
     CLONE_DEPTH = 5
 
     def self.description
-      "Checkout a release commit from a git repository"
+      "Checkout a specific commit from a git repository suitable for building"
     end
 
     cli_argument :git_url, "URL used to clone the git repository"
