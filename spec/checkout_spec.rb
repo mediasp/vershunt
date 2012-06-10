@@ -162,27 +162,27 @@ describe 'checkout' do
 
     it 'will checkout the lastest release on a branch if you pass BRANCH_NAME as an argument' do
       in_tmp_dir do
-        run_msp_release "checkout #{@remote_repo} release-0.0.1"
+        run_msp_release "checkout #{@remote_repo} release-0.0"
 
         last_run.should exit_with(0)
-        last_stdout.should match("Checking out latest release commit from origin/release-0.0.1")
+        last_stdout.should match("Checking out latest release commit from origin/release-0.0")
         last_stdout.should match("Checked out to project-0.0.1-1")
 
         File.directory?('project-0.0.1-1').should be_true
         Dir.chdir 'project-0.0.1-1' do
           run_msp_release 'status'
           last_stdout.should match('^Release commit : 0.0.1-1')
-          last_stdout.should match('^Release branch : 0.0.1')
+          last_stdout.should match('^Release branch : 0.0')
         end
       end
     end
 
     it 'will build the package if you pass --build' do
       in_tmp_dir do
-        run_msp_release "checkout --build #{@remote_repo} release-0.0.1"
+        run_msp_release "checkout --build #{@remote_repo} release-0.0"
 
         last_run.should exit_with(0)
-        last_stdout.should match("Checking out latest release commit from origin/release-0.0.1")
+        last_stdout.should match("Checking out latest release commit from origin/release-0.0")
         last_stdout.should match("Checked out to project-0.0.1-1")
 
 

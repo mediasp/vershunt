@@ -62,7 +62,7 @@ class MSPRelease::Project
   end
 
   def branch_name(version=self.version)
-    "release-#{version.format}"
+    "release-#{version.format(:without_bugfix => true)}"
   end
 
   def at_version?(rhs_version)

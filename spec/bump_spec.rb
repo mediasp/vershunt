@@ -18,45 +18,19 @@ describe 'bump' do
       end
     end
 
-    it 'can bump the bugfix version, creating and switching to a new release ' +
-      'branch if you are already on a release branch' do
+    it 'can bump the bugfix version on a release branch' do
       in_project_dir do
         project_version_should_match('0.0.1')
         run_msp_release 'branch'
         last_run.should exit_with(0)
-        release_branch_should_match('0.0.1')
+        release_branch_should_match('0.0')
 
         run_msp_release 'bump bugfix'
         last_run.should exit_with(0)
-        last_stdout.should include("Making and switching to release branch: release-0.0.2\n")
         run "git --no-pager log -1"
         last_stdout.should include("BUMPED VERSION TO 0.0.2")
         project_version_should_match('0.0.2')
-        release_branch_should_match('0.0.2')
-
-        # check it does not alter the history of the previous branch
-        run "git checkout release-0.0.1"
-        run "git --no-pager log -1"
-        last_stdout.should include("initial commit")
-        project_version_should_match('0.0.1')
-        release_branch_should_match('0.0.1')
-      end
-    end
-
-    it 'can bump the bugfix version, staying on the existing branch if you ' +
-      'pass --no-branch' do
-      in_project_dir do
-        project_version_should_match('0.0.1')
-        run_msp_release 'branch'
-        release_branch_should_match('0.0.1')
-
-        run_msp_release 'bump bugfix --no-branch'
-        last_run.should exit_with(0)
-        run "git --no-pager log -1"
-        last_stdout.should include("BUMPED VERSION TO 0.0.2")
-
-        project_version_should_match('0.0.2')
-        release_branch_should_match('0.0.1')
+        release_branch_should_match('0.0')
       end
     end
 
@@ -77,7 +51,7 @@ describe 'bump' do
       in_project_dir do
         project_version_should_match('0.0.1')
         run_msp_release 'branch'
-        release_branch_should_match('0.0.1')
+        release_branch_should_match('0.0')
 
         run_msp_release 'bump minor'
         last_run.should exit_with(1)
@@ -92,7 +66,7 @@ describe 'bump' do
       in_project_dir do
         project_version_should_match('0.0.1')
         run_msp_release 'branch'
-        release_branch_should_match('0.0.1')
+        release_branch_should_match('0.0')
 
         run_msp_release 'bump minor --force'
         last_run.should exit_with(0)

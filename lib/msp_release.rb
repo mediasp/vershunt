@@ -27,7 +27,7 @@ module MSPRelease
     end
 
     def git_version
-      Version.from_string(/release-(.+)/.match(git.cur_branch)[1])
+      (m = /release-(.+)/.match(git.cur_branch)) && m[1]
     end
 
     def time; @time ||= Time.now; end
@@ -121,7 +121,11 @@ module MSPRelease
   VERSION_SEGMENTS = [:major, :minor, :bugfix]
   Version = Struct.new(*VERSION_SEGMENTS)
   Version.module_eval do
-    def format; "#{major}.#{minor}.#{bugfix}"; end
+
+    def format(opts={})
+      opts[:without_bugfix] ? "#{major}.#{minor}" : "#{major}.#{minor}.#{bugfix}"
+    end
+
     alias :to_s :format
 
     def self.from_string(str)

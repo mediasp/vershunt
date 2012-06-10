@@ -18,8 +18,8 @@ describe 'branch' do
         run_msp_release 'branch'
         last_run.should exit_with(0)
         last_stdout.should match('Bumping master to 0.2.0, pushing to origin...')
-        last_stdout.should match("Switched to release branch 'release-0.1.0'")
-        release_branch_should_match('0.1.0')
+        last_stdout.should match("Switched to release branch 'release-0.1'")
+        release_branch_should_match('0.1')
 
         exec "git checkout master"
         project_version_should_match('0.2.0')
@@ -59,7 +59,7 @@ describe 'branch' do
       in_project_dir do
         run_msp_release 'branch --no-bump-master'
         last_run.should exit_with(0)
-        release_branch_should_match('0.1.0')
+        release_branch_should_match('0.1')
 
         exec "git checkout master"
         project_version_should_match('0.1.0')
@@ -97,7 +97,7 @@ describe 'branch' do
         last_run.should exit_with(0)
         last_stderr.should match("Creating a non-master release branch")
 
-        release_branch_should_match('0.1.0')
+        release_branch_should_match('0.1')
 
         # check it did not mess with original branch
         exec "git checkout ovum"
