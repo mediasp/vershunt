@@ -27,7 +27,7 @@ module MSPRelease
     end
 
     # hardcoded list of commands
-    COMMANDS = ['help', 'new', 'push', 'branch', 'status', 'reset', 'bump', 'build', 'distrib', 'checkout']
+    COMMANDS = ['help', 'new', 'push', 'branch', 'status', 'reset', 'bump', 'checkout']
 
     # These are available on the CLI module
     module ClassMethods
