@@ -9,10 +9,10 @@ module MSPRelease
     def self.help
       <<-HELP
 Create a release branch suitable for creating release commits.  The release branch will
-be named after the project version returned by `msp_release status`, so if the version is
-1.2.3, a branch of release-1.2.3 will be created.
+be named after the project version returned by `msp_release status`, excluding the bugfix version.  If the version is
+1.2.3, a branch of release-1.2 will be created.
 
-The minor version on master is bumped after the branch is created.
+The minor version on master is bumped after the branch is created, although this can be disabled.
 HELP
     end
 
