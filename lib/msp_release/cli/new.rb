@@ -15,6 +15,12 @@ module MSPRelease
       :type  => :string
     }
 
+    cli_option :force, "Force creation of a release commit from a non-release branch", {
+      :short   => 'f',
+      :long    => 'force',
+      :default => false
+    }
+
     def run
       fail_if_push_pending
       fail_if_modified_wc
@@ -45,9 +51,14 @@ module MSPRelease
 
     def fail_unless_on_release_branch
       if git.cur_branch != project.branch_name
-        $stderr.puts("You must be on a release branch to create release commits")
-        $stderr.puts("Switch to a release branch, or build from any branch without creating a release commit for development builds")
-        exit 1
+        if options[:force]
+          $stderr.puts("Not on a release branch, forcing creation of release " +
+            "commit.  #{git.cur_branch} != #{project.branch_name}")
+        else
+          $stderr.puts("You must be on a release branch to create release commits, or use --force.")
+          $stderr.puts("Switch to a release branch, or build from any branch without creating a release commit for development builds")
+          exit 1
+        end
       end
     end
 

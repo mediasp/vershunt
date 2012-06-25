@@ -17,6 +17,15 @@ describe 'creating and pushing releases' do
       end
     end
 
+    it 'succeeds if you are not on a release branch, but you supply --force' do
+      in_project_dir do |dir|
+        run_msp_release 'new --force'
+        last_run.should exit_with(0)
+        last_stderr.should include("Not on a release branch, forcing creation of release commit.")
+        last_stdout.should include("Changelog now at 0.0.1-1\n")
+      end
+    end
+
     it 'creates a -1 release on a release branch' do
       in_project_dir do |dir|
         run_msp_release 'branch'
