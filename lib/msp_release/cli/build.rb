@@ -3,9 +3,7 @@ module MSPRelease
 
     include CLI::WorkingCopyCommand
 
-    def self.description
-      "Build debian packages suitable for deployment"
-    end
+    description "Build debian packages suitable for deployment"
 
     def run
       fail_if_modified_wc

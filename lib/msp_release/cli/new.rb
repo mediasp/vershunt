@@ -3,11 +3,9 @@ module MSPRelease
 
     include CLI::WorkingCopyCommand
 
-    def self.description
-      "Prepare master or a release branch for a release push"
-    end
+    description "Prepare master or a release branch for a release push"
 
-    cli_option :distribution, "Specify a new debian distribution to put in the " +
+    opt :distribution, "Specify a new debian distribution to put in the " +
       "changelog for this new version",
     {
       :short => 'd',

@@ -7,47 +7,45 @@ module MSPRelease
     # When cloning repositories, limit to this many commits from each head
     CLONE_DEPTH = 5
 
-    def self.description
-      "Checkout a specific commit from a git repository suitable for building"
-    end
+    description """Checkout a specific commit from a git repository suitable
+for building.
 
-    def self.help
-      <<-HELP
-Checks out either the latest commit or latest latest release commit ready for building.  When no BRANCH_NAME
-is given, or that branch is not a release branch, the latest commit is checked out and the changelog
-version is adjusted to signify this will be a development build.
+When no BRANCH_NAME is given, or that branch is not a release branch, the
+latest commit is checked out and the changelog version is adjusted to signify
+this will be a development build.
 
-If BRANCH_NAME denotes a release branch (i.e release-1.0.2) then the latest /release/ commit is checked out, even if there are commits after it.
-The changelog remains unaltered in this case - the release commit would have updated all version information.
-HELP
-    end
+If BRANCH_NAME denotes a release branch (i.e release-1.0.2) then the latest
+/release/ commit is checked out, even if there are commits after it.
+The changelog remains unaltered in this case - the release commit would have
+updated all version information.
+"""
 
-    cli_argument :git_url, "URL used to clone the git repository"
-    cli_argument :branch_name, "Name of a branch on master to switch to once checked out",
+    arg :git_url, "URL used to clone the git repository"
+    arg :branch_name, "Name of a branch on master to switch to once checked out",
       :required => false
 
-    cli_option :build, "Build a debian package immediately after checking " +
+    opt :build, "Build a debian package immediately after checking " +
       "out, using the dpkg-buildpackage command",
     {
       :short   => 'b',
       :default => false
     }
 
-    cli_option :tar, "Create a tarfile containing all the debian build " +
+    opt :tar, "Create a tarfile containing all the debian build " +
       "products when using --build",
     {
       :short   => 't',
       :default => false
     }
 
-    cli_option :shallow, "Only perform a shallow checkout to a depth of five" +
+    opt :shallow, "Only perform a shallow checkout to a depth of five" +
       "commits from each head.  See git documentation for more details",
     {
       :short   => 's',
       :default => false
     }
 
-    cli_option :distribution, "Specify the debian distribution to put in the " +
+    opt :distribution, "Specify the debian distribution to put in the " +
       "changelog when checking out a development version",
     {
       :short => 'd',

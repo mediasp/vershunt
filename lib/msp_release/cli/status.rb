@@ -3,9 +3,7 @@ module MSPRelease
 
     include CLI::WorkingCopyCommand
 
-    def self.description
-      "Print out discovered release state"
-    end
+    description "Print out discovered release state"
 
     def run
       bits = []

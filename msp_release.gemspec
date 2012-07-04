@@ -14,6 +14,7 @@ spec = Gem::Specification.new do |s|
 
   s.add_dependency('POpen4', '~> 0.1.0')
   s.add_dependency('trollop')
+  s.add_dependency('climate')
 
   s.add_development_dependency('rspec', '~> 2.8.0')
 end

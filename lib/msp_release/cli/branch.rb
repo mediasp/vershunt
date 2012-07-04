@@ -2,21 +2,17 @@ module MSPRelease
   class CLI::Branch < CLI::Command
     include CLI::WorkingCopyCommand
 
-    def self.description
-      "Create and switch to a release branch for the version on HEAD"
-    end
+    description """
+Create and switch to a release branch for the version on HEAD
 
-    def self.help
-      <<-HELP
-Create a release branch suitable for creating release commits.  The release branch will
-be named after the project version returned by `msp_release status`, excluding the bugfix version.  If the version is
+The release branch will be named after the project version returned by
+`msp_release status`, excluding the bugfix version.  If the version is
 1.2.3, a branch of release-1.2 will be created.
 
 The minor version on master is bumped after the branch is created, although this can be disabled.
-HELP
-    end
+"""
 
-    cli_option :allow_non_master_branch, "Allow release branch to be created " +
+    opt :allow_non_master_branch, "Allow release branch to be created " +
       "even if you are not on master.  Normally you would not want to do" +
       " this, so this is here to prevent branches from mistakenly being " +
       "created from branches other than master",
@@ -26,7 +22,7 @@ HELP
     }
 
 
-    cli_option :no_bump_master, "Do not bump the minor version of master " +
+    opt :no_bump_master, "Do not bump the minor version of master " +
       "as part of creating the release branch.  Typically after creating a " +
       "release branch, the minor version being stabilised now lives on the " +
       "branch and master is now a new version",

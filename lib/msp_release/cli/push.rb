@@ -3,9 +3,7 @@ module MSPRelease
 
     include CLI::WorkingCopyCommand
 
-    def self.description
-      "Push a new release to origin"
-    end
+    description "Push a new release to origin"
 
     def run
       unless data_exists?

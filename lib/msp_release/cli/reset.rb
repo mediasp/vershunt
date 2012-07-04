@@ -3,9 +3,7 @@ module MSPRelease
 
     include CLI::WorkingCopyCommand
 
-    def self.description
-      "Reset changes made by msp_release new"
-    end
+    description "Reset changes made by msp_release new"
 
     def run
       unless data_exists?

@@ -3,13 +3,11 @@ module MSPRelease
 
     include CLI::WorkingCopyCommand
 
-    def self.description
-      "Increase the version number of the project"
-    end
+    description "Increase the version number of the project"
 
-    cli_argument :segment, "One of major, minor or bugfix"
+    arg :segment, "One of major, minor or bugfix"
 
-    cli_option :force, "Force bumping of version segments other than bugfix " +
+    opt :force, "Force bumping of version segments other than bugfix " +
       "if you are not on master.  By default, you bump minor and major from" +
       " master, and you bump the bugfix version while on a branch.",
     {
