@@ -13,7 +13,7 @@ module MSPRelease
       :type  => :string
     }
 
-    cli_option :force, "Force creation of a release commit from a non-release branch", {
+    opt :force, "Force creation of a release commit from a non-release branch", {
       :short   => 'f',
       :long    => 'force',
       :default => false
