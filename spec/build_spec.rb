@@ -42,7 +42,7 @@ describe 'build' do
   end
 
   it 'fails if the build command fails' do
-    @build_extra = "exit 1"
+    @build_extra = "echo 'spline diffraction imbalance' 1>&2 \nexit 1"
     project = build_init_project('project', {
       :deb => deb_options
     })
@@ -53,7 +53,8 @@ describe 'build' do
       run_msp_release 'push'
       run_msp_release 'build'
       assert_exit_status 1
-      last_stderr.should include('Command failed')
+      last_stderr.should include('build failed:')
+      last_stderr.should include('spline diffraction imbalance')
     end
   end
 

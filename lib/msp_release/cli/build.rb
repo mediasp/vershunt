@@ -12,7 +12,11 @@ module MSPRelease
       commit = git.latest_commit(project)
       fail_unless_release_commit(commit)
 
-      exec build_command
+      begin
+        exec build_command
+      rescue Exec::UnexpectedExitStatus => e
+        raise Climate::ExitException.new(self, "build failed:\n#{e.stderr}")
+      end
 
       looking_for = project.changelog.version.to_s
       changes_file = find_changes_file(looking_for)
