@@ -1,0 +1,68 @@
+.TH msp_release 1 "July 2012" "MSP-Release Manual"
+
+.SH "NAME"
+
+.P
+
+msp_release - manipulate your git SCM for repeatable builds
+
+.SH "SYNOPSIS"
+
+.P
+
+.I
+msp_release
+<command> [<args>]
+
+.SH "DESCRIPTION"
+
+.P
+Manipulate your git repository by creating commits and performing
+branch management to create a consistent log of commits to be used
+as part of a repeatable build system, as well as encouraging
+semantic versioning (see http://semver.org).
+
+.P
+Projects must include a .msp_project, which is a yaml file that must at least
+not be empty.  If the project file has a ruby_version_file key, then this
+file will be considered as well as the debian changelog when updating version
+information.
+
+.SH "OPTIONS"
+
+.IP <command> 0.4i
+Name of the command to run
+
+.IP <args>
+Arguments to supply to the command
+
+.SH "COMMANDS"
+
+.IP help
+.br
+Print help on a command
+.IP new
+.br
+Create a new release commit
+.IP push
+.br
+Push a new release commit
+.IP branch
+.br
+Create a release branch
+.IP status
+.br
+Query current status of the working copy
+.IP reset
+.br
+Reset anything done by
+.I new
+.IP bump
+.br
+Bump part of the version of the project
+.IP checkout
+.br
+Checkout a fresh copy from source control, suitable for building or archival
+.IP build
+.br
+Build from the current working copy
