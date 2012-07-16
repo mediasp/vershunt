@@ -7,8 +7,7 @@ module MSPRelease
 
     def run
       unless data_exists?
-        $stderr.puts("You need to stage a new release before you can push it")
-        exit 1
+        raise CLI::Exit, "You need to stage a new release before you can push it"
       end
 
       load_data
@@ -20,7 +19,7 @@ module MSPRelease
       exec "git commit -m\"#{commit_message}\""
       exec "git tag #{tagname}"
       exec "git push origin #{git.cur_branch}"
-      $stdout.puts "Pushing new release tag: #{tagname}"
+      stdout.puts "Pushing new release tag: #{tagname}"
       exec "git push origin #{tagname}"
 
       remove_data

@@ -18,6 +18,25 @@ module MSPRelease
       @project = project
     end
 
+    def perform_from_cli!
+      $stdout.puts("Building package...")
+
+      result =
+        begin
+          self.perform!
+        rescue Exec::UnexpectedExitStatus => e
+          raise CLI::Exit, "build failed:\n#{e.stderr}"
+        rescue Build::NoChangesFileError => e
+          raise CLI::Exit, "Unable to find changes file with version: " +
+            "#{e.message}\nAvailable: \n" +
+            self.available_changes_files.map { |f| "  #{f}" }.join("\n")
+        end
+
+      result.tap do
+        $stdout.puts("Package built: #{result.changes_file}")
+      end
+    end
+
     def perform!
       dir = File.expand_path(@basedir)
       raise "directory does not exist: #{dir}" unless

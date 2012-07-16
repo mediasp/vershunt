@@ -50,7 +50,7 @@ The minor version on master is bumped after the branch is created, although this
         MSPRelease::MakeBranch.new(git, branch_name, :start_point => branch_from).
           perform!
       rescue MSPRelease::MakeBranch::BranchExistsError => e
-        raise MSPRelease::ExitException, "A branch already exists for #{version}"
+        raise CLI::Exit, "A branch already exists for #{version}"
       end
 
       $stdout.puts("Switched to release branch '#{branch_name}'")
@@ -61,7 +61,7 @@ The minor version on master is bumped after the branch is created, although this
         $stderr.puts("Creating a non-master release branch, --allow-non-master-branch supplied")
         "HEAD@{0}"
       else
-        raise MSPRelease::ExitException, "You must be on master to create " +
+        raise CLI::Exit, "You must be on master to create " +
           "release branches, or pass --allow-non-master-branch"
       end
     end
@@ -86,7 +86,7 @@ The minor version on master is bumped after the branch is created, although this
       rescue
         $stderr.puts "error pushing bump commit to master, undoing bump..."
         exec "git reset --hard HEAD@{1}"
-        raise MSPRelease::ExitException, 'could not push bump commit to master, if you do ' +
+        raise CLI::Exit, 'could not push bump commit to master, if you do ' +
           'not want to bump the minor version of master, try again with ' +
           '--no-bump-master'
       end

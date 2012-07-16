@@ -30,7 +30,9 @@ module MSPRelease
 
       new_version =
         if deb_version.to_version != project_version
-          $stderr.puts("Warning: project version (#{project_version.to_s}) did not match changelog version (#{deb_version.to_s}), project version wins")
+          stderr.puts "Warning: project version (#{project_version.to_s}) " +
+          "did not match changelog version (#{deb_version.to_s}), project " +
+          "version wins"
           changelog.reset_at(project_version)
         else
           deb_version.bump
@@ -47,15 +49,19 @@ module MSPRelease
       puts_changelog_info
     end
 
+    def not_on_release_branch_msg
+      "You must be on a release branch to create " +
+      "release commits, or use --force.\nSwitch to a release branch, or build " +
+      "from any branch without creating a release commit for development builds"
+    end
+
     def fail_unless_on_release_branch
       if git.cur_branch != project.branch_name
         if options[:force]
-          $stderr.puts("Not on a release branch, forcing creation of release " +
+          stderr.puts("Not on a release branch, forcing creation of release " +
             "commit.  #{git.cur_branch} != #{project.branch_name}")
         else
-          $stderr.puts("You must be on a release branch to create release commits, or use --force.")
-          $stderr.puts("Switch to a release branch, or build from any branch without creating a release commit for development builds")
-          exit 1
+          raise CLI::Exit, not_on_release_branch_msg
         end
       end
     end
@@ -65,7 +71,8 @@ module MSPRelease
       if suffix.nil? || suffix_pattern.match(suffix)
         suffix.to_i + 1
       else
-        raise ExitException, "malformed suffix: #{suffix}\Fix the changelog and try again"
+        raise CLI::Exit, "malformed suffix: #{suffix}\n" +
+          "Fix the changelog and try again"
       end
     end
   end

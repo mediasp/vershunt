@@ -43,7 +43,6 @@ describe 'creating and pushing releases' do
         run_msp_release 'branch'
         run_msp_release 'new'
         last_run.should exit_with(0)
-        assert_exit_status
 
         run_msp_release 'new'
         last_run.should exit_with(1)
@@ -144,7 +143,8 @@ describe 'creating and pushing releases' do
 
   def assert_push
     run_msp_release 'push'
-    assert_exit_status
+    last_run.should exit_with(0)
+
     tagline = last_stdout.split("\n").grep(/Pushing new release tag: /).first
     tagline.should_not be_nil
     @pushed_tag = /new release tag: (.+)$/.match(tagline)[1]

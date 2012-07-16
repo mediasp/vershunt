@@ -2,16 +2,7 @@ require 'yaml'
 
 module MSPRelease
 
-  class ExitException < Exception
-
-    attr_reader :exitstatus
-
-    def initialize(msg, exitstatus=1)
-      @exitstatus = exitstatus
-      super(msg)
-    end
-  end
-
+  require 'climate'
   require 'msp_release/exec'
 
   include Exec::Helpers

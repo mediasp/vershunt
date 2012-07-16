@@ -21,7 +21,7 @@ describe 'build' do
       run_msp_release 'new'
       run_msp_release 'push'
       run_msp_release 'build'
-      assert_exit_status 1
+      last_run.should exit_with(1)
       last_stderr.should include('project does not define a build_command')
     end
   end
@@ -36,7 +36,7 @@ describe 'build' do
 
     in_project_dir do
       run_msp_release 'build'
-      assert_exit_status 1
+      last_run.should exit_with(1)
       last_stderr.should include('HEAD is not a release commit')
     end
   end
@@ -52,7 +52,8 @@ describe 'build' do
       run_msp_release 'new'
       run_msp_release 'push'
       run_msp_release 'build'
-      assert_exit_status 1
+
+      last_run.should exit_with 1
       last_stderr.should include('build failed:')
       last_stderr.should include('spline diffraction imbalance')
     end
@@ -68,7 +69,7 @@ describe 'build' do
       run_msp_release 'new'
       run_msp_release 'push'
       run_msp_release 'build'
-      assert_exit_status 1
+      last_run.should exit_with(1)
       last_stderr.should include('Unable to find changes file')
     end
   end
@@ -86,7 +87,7 @@ describe 'build' do
       run_msp_release 'new'
       run_msp_release 'push'
       run_msp_release 'build'
-      assert_exit_status 1
+      last_run.should exit_with(1)
       last_stderr.should include('Unable to find changes file with version: 0.0.1-1')
     end
   end
@@ -104,7 +105,7 @@ describe 'build' do
       run_msp_release 'new'
       run_msp_release 'push'
       run_msp_release 'build'
-      assert_exit_status
+      last_run.should exit_with(0)
       last_stdout.should match(/^Package built: (.+)project_0\.0\.1\-1_all\.changes$/)
     end
 

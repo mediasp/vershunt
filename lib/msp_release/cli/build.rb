@@ -12,25 +12,8 @@ module MSPRelease
       commit = git.latest_commit(project)
       fail_unless_release_commit(commit)
 
-      begin
-        exec build_command
-      rescue Exec::UnexpectedExitStatus => e
-        raise Climate::ExitException.new(self, "build failed:\n#{e.stderr}")
-      end
-
-      looking_for = project.changelog.version.to_s
-      changes_file = find_changes_file(looking_for)
-
-      if changes_file
-        $stdout.puts("Package built: #{changes_file}")
-      else
-        $stderr.puts("Unable to find changes file with version: #{looking_for}")
-        $stderr.puts("Available:")
-        available_changes_files.each do |f|
-          $stderr.puts("  #{f}")
-        end
-        exit 1
-      end
+      build = Build.new('.', project)
+      build.perform_from_cli!
     end
 
     private
@@ -63,16 +46,14 @@ module MSPRelease
 
     def fail_unless_release_commit(commit)
       if ! commit.release_commit?
-        $stderr.puts("HEAD is not a release commit:")
-        $stderr.puts("    #{commit.message[0...40]}...")
-        exit 1
+        raise CLI::Exit, "HEAD is not a release commit:\n" +
+          "    #{commit.message[0...40]}..."
       end
     end
 
     def fail_unless_has_build_command
       if build_command.nil? || build_command.empty?
-        $stderr.puts("project does not define a build_command, can't build")
-        exit 1
+        raise CLI::Exit, "project does not define a build_command, can't build"
       end
     end
   end

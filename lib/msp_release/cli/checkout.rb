@@ -90,7 +90,7 @@ updated all version information.
             find_first_release_commit(project)
 
           if first_commit_hash.nil?
-            raise ExitException, "Could not find a release commit on #{pathspec}"
+            raise CLI::Exit, "Could not find a release commit on #{pathspec}"
           end
 
           exec "git reset --hard #{first_commit_hash}"
@@ -111,17 +111,7 @@ updated all version information.
         $stdout.puts("Building package...")
         build = Build.new(src_dir, project)
 
-        result =
-          begin
-            result = build.perform!
-          rescue Build::NoChangesFileError => e
-            raise ExitException.new(
-            "Unable to find changes file with version: #{e.message}\n" +
-            "Available: \n" +
-            build.available_changes_files.map { |f| "  #{f}" }.join("\n"))
-          end
-
-        $stdout.puts("Package built: #{result.changes_file}")
+        result = build.perform_from_cli!
         tar_it_up(project, result) if tar_it
       end
     end
@@ -169,7 +159,7 @@ updated all version information.
         exec("git show #{pathspec} --")
       rescue Exec::UnexpectedExitStatus => e
         if /^fatal: bad revision/.match(e.stderr)
-          raise ExitException, "Git pathspec '#{pathspec}' does not exist"
+          raise CLI::Exit, "Git pathspec '#{pathspec}' does not exist"
         else
           raise
         end

@@ -6,10 +6,8 @@ module MSPRelease
     description "Reset changes made by msp_release new"
 
     def run
-      unless data_exists?
-        $stderr.puts("Error: No waiting changes")
-        exit 1
-      end
+
+      raise CLI::Exit, "No waiting changes" unless data_exists?
 
       exec "git checkout #{project.changelog_path}"
       remove_data

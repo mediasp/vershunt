@@ -1,8 +1,13 @@
 module MSPRelease
   module CLI
 
-    require 'trollop'
-    require 'msp_release/cli/command'
+    # Base class for command line operations
+    class Command < Climate::Command
+      include Exec::Helpers
+    end
+
+    # alias this class for shorter lines
+    Exit = Climate::ExitException
 
     # root of the command hierarchy
     class Root < Climate::Command

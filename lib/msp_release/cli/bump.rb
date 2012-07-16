@@ -34,9 +34,8 @@ module MSPRelease
       not_on_master = !git.on_master?
 
       if not_on_master && segment != 'bugfix' && ! force
-        raise MSPRelease::ExitException, "You must be on master to bump " +
-          "the #{segment} version, or pass --force if you are sure this is " +
-          "what you want to do"
+        raise CLI::Exit, "You must be on master to bump the #{segment} version" +
+          ", or pass --force if you are sure this is what you want to do"
       end
     end
 
