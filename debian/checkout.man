@@ -1,0 +1,7 @@
+.TH msp_release-checkout 1 "July 2012" "MSP-Release Manual"
+
+.SH "Name"
+
+.P
+
+msp_release checkout - Checkout a fresh copy from source control, suitable for building or archival
