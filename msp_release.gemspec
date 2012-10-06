@@ -13,9 +13,10 @@ spec = Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.add_dependency('POpen4', '~> 0.1.0')
-  s.add_dependency('climate', '~> 0.2.0')
+  s.add_dependency('climate', '~> 0.5.0')
 
   s.add_development_dependency('rspec', '~> 2.8.0')
+  s.add_development_dependency('rake')
 end
 
 

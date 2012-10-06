@@ -10,8 +10,7 @@ module MSPRelease
     Exit = Climate::ExitException
 
     # root of the command hierarchy
-    class Root < Climate::Command
-      name 'msp_release'
+    class Root < Climate::Command('msp_release')
 
       description """
 Manipulate your git repository by creating commits and performing
@@ -74,7 +73,7 @@ information.
 
           command = MSPRelease::CLI.const_get(camel_name)
           @commands[name] = command
-          command.name(name)
+          command.set_name(name)
           command.subcommand_of(Root)
         end
       end
