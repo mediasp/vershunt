@@ -10,7 +10,7 @@ module MSPRelease
     Exit = Climate::ExitException
 
     # root of the command hierarchy
-    class Root < Climate::Command('msp_release')
+    class Root < Climate::Command('vershunt')
 
       description """
 Manipulate your git repository by creating commits and performing

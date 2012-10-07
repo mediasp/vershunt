@@ -4,3 +4,7 @@ debian/files
 debian/msp-release
 debian/*.log
 debian/msp-release.substvars
+debian/vershunt*
+*.gem
+.bundle
+tmp

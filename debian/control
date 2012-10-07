@@ -1,4 +1,4 @@
-Source: msp-release
+Source: vershunt
 Section: devel
 Priority: extra
 Maintainer: Nick Griffiths <nick@mediasp.com>
@@ -6,9 +6,10 @@ Build-Depends: debhelper (>= 8.0.0)
 Standards-Version: 3.9.2
 Vcs-Git: git://git.playlouder.com/var/cache/git/msp_release.git
 
-Package: msp-release
+Package: vershunt
 Architecture: all
 Depends: ruby, git-core
-Description: Command for building MSP's debian packages from source
- Helper script for tagging, building and pushing packages from source in to
- debian apt repositories
+Replaces: msp-release
+Description: Repeatable build system tool
+ Maintain versioning information in a consistent way, then build debian packages
+ consistently.

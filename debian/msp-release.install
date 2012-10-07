@@ -1,3 +1,0 @@
-lib usr/lib/msp_release
-build/flat/. usr/lib/msp_release/lib
-build/msp_release usr/bin

@@ -6,7 +6,7 @@ module MSPRelease
 Create and switch to a release branch for the version on HEAD
 
 The release branch will be named after the project version returned by
-`msp_release status`, excluding the bugfix version.  If the version is
+`vershunt status`, excluding the bugfix version.  If the version is
 1.2.3, a branch of release-1.2 will be created.
 
 The minor version on master is bumped after the branch is created, although this can be disabled.

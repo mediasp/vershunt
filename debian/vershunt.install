@@ -1,0 +1,4 @@
+lib usr/lib/vershunt
+build/flat/. usr/lib/vershunt/lib
+build/msp_release usr/bin
+build/vershunt usr/bin

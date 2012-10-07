@@ -72,7 +72,7 @@ updated all version information.
         puts("Checking out latest commit from #{pathspec}#{shallow_output}")
       end
 
-      tmp_dir = "msp_release-#{Time.now.to_i}.tmp"
+      tmp_dir = "vershunt-#{Time.now.to_i}.tmp"
       Git.clone(git_url, {:depth => clone_depth, :out_to => tmp_dir,
           :exec => {:quiet => true}})
 

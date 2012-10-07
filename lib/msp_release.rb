@@ -74,7 +74,7 @@ module MSPRelease
     end
 
     def puts_changelog_info
-      puts "OK, please update the change log, then run 'msp_release push' to push your changes for building"
+      puts "OK, please update the change log, then run 'vershunt push' to push your changes for building"
     end
 
     def fail_if_modified_wc

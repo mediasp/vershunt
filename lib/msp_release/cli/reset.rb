@@ -3,7 +3,7 @@ module MSPRelease
 
     include CLI::WorkingCopyCommand
 
-    description "Reset changes made by msp_release new"
+    description "Reset changes made by vershunt new"
 
     def run
 

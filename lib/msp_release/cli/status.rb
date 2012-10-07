@@ -10,7 +10,7 @@ module MSPRelease
 
       if data_exists?
         load_data
-        puts "Awaiting push.  Please update the changelog, then run msp_release push "
+        puts "Awaiting push.  Please update the changelog, then run vershunt push "
         bits.push(["Pending", data[:version]])
       else
         changelog_version = changelog.version
