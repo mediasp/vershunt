@@ -9,9 +9,10 @@ module MSPRelease
       attr_reader :changes_file
 
       def files
+        dir = File.dirname(changes_file)
         changes = File.read(changes_file).split("\n")
         files_start = changes.index {|l| /^Files: $/.match(l) } + 1
-        changes[files_start..-1].map {|l| l.split(" ").last } +
+        changes[files_start..-1].map {|l| File.join(dir, l.split(" ").last) } +
           [changes_file]
       end
     end
