@@ -43,6 +43,12 @@ updated all version information.
       :default => false
     }
 
+    opt :sign, "Pass options to dpkg-buildpackage to tell it whether or not to sign the build products",
+    {
+      :short => 'S',
+      :default => false
+    }
+
     opt :tar, "Create a tarfile containing all the debian build " +
       "products when using --build",
     {
@@ -122,7 +128,7 @@ updated all version information.
       if do_build
         log("Building package...")
         out = noisy?? stdout : StringIO.new
-        build = Build.new(src_dir, project, out)
+        build = Build.new(src_dir, project, :out => out, :sign => options[:sign])
 
         result = build.perform_from_cli!
         if print_files?

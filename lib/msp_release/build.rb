@@ -21,10 +21,13 @@ module MSPRelease
 
     include Exec::Helpers
 
-    def initialize(basedir, project, out=$stdout)
+    def initialize(basedir, project, options={})
       @basedir = basedir
       @project = project
-      @out = out
+      @options = options
+
+      @out = options[:out] || $stdout
+      @sign = options.fetch(:sign, true)
     end
 
     def perform_from_cli!
@@ -84,7 +87,7 @@ module MSPRelease
       if cmd = @project.config[:deb_build_command]
         cmd
       else
-        'dpkg-buildpackage'
+        "dpkg-buildpackage" + (@sign ? '' : ' -us -uc')
       end
     end
 
