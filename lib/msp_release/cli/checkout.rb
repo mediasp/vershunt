@@ -31,6 +31,18 @@ updated all version information.
       :default => false
     }
 
+    opt :noise, "Print output to stdout",
+    {
+      :short => 'n',
+      :default => true
+    }
+
+    opt :print_files, "Print out built files to stdout",
+    {
+      :short => 'p',
+      :default => false
+    }
+
     opt :tar, "Create a tarfile containing all the debian build " +
       "products when using --build",
     {
@@ -67,9 +79,9 @@ updated all version information.
 
       shallow_output = clone_depth.nil?? '' : ' (shallow)'
       if release_spec_arg && branch_is_release_branch
-        puts("Checking out latest release commit from #{pathspec}#{shallow_output}")
+        log("Checking out latest release commit from #{pathspec}#{shallow_output}")
       else
-        puts("Checking out latest commit from #{pathspec}#{shallow_output}")
+        log("Checking out latest commit from #{pathspec}#{shallow_output}")
       end
 
       tmp_dir = "vershunt-#{Time.now.to_i}.tmp"
@@ -105,13 +117,17 @@ updated all version information.
 
       FileUtils.mv(tmp_dir, src_dir)
       project = Project.new_from_project_file(src_dir + "/" + Helpers::PROJECT_FILE)
-      $stdout.puts("Checked out to #{src_dir}")
+      log("Checked out to #{src_dir}")
 
       if do_build
-        $stdout.puts("Building package...")
-        build = Build.new(src_dir, project)
+        log("Building package...")
+        out = noisy?? stdout : StringIO.new
+        build = Build.new(src_dir, project, out)
 
         result = build.perform_from_cli!
+        if print_files?
+          result.files.each {|f| stdout.puts(f) }
+        end
         tar_it_up(project, result) if tar_it
       end
     end
@@ -119,14 +135,23 @@ updated all version information.
     private
 
     def tar_it_up(project, result)
-      changes = File.read(result.changes_file).split("\n")
-      files_start = changes.index {|l| /^Files: $/.match(l) } + 1
-      files = changes[files_start..-1].map {|l| l.split(" ").last } +
-        [result.changes_file]
-
+      files = result.files
       tarfile = "#{project.source_package_name}-#{project.changelog.version}.tar"
       exec("tar -cf #{tarfile} #{files.join(' ')}")
-      $stdout.puts("Build products archived in to #{tarfile}")
+      log("Build products archived in to #{tarfile}")
+      stdout.puts(tarfile) if print_files?
+    end
+
+    def print_files?
+      options[:print_files]
+    end
+
+    def noisy?
+      options[:noise]
+    end
+
+    def log(message)
+      stdout.puts(message) if noisy?
     end
 
     def oneline_pattern

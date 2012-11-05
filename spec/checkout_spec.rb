@@ -204,6 +204,44 @@ describe 'checkout' do
     end
   end
 
+  describe "with --no-noise" do
+
+    before do
+      build_init_project('project', {:deb =>
+          {:build_command => "dpkg-buildpackage -us -uc"}})
+
+      in_project_dir do
+        run_msp_release 'branch'
+        run_msp_release 'new'
+        run_msp_release 'push'
+      end
+    end
+
+    it "will build the package with no output" do
+      in_tmp_dir do
+        run_msp_release "checkout --no-noise --build #{@remote_repo} release-0.0"
+        last_run.should exit_with(0)
+        last_stdout.strip.should == ""
+      end
+    end
+
+    it "will output any build products if you supply --print-files" do
+      in_tmp_dir do
+        run_msp_release "checkout --no-noise --print-files --build #{@remote_repo} release-0.0"
+        last_run.should exit_with(0)
+        last_stdout.strip.should_not == ""
+        last_stdout.should match "project_0.0.1-1.tar.gz"
+        last_stdout.should match /project_0\.0\.1\-1\_(.+)\.deb/
+        last_stdout.should match /project_0\.0\.1\-1\_(.+)\.changes/
+        last_stdout.should match /project_0\.0\.1\-1\_(.+)\.dsc/
+      end
+    end
+
+    it "will output only the name of the tar file if you supply --print-files" +
+      " and --tar" do
+    end
+  end
+
   describe "with --shallow" do
     before do
       build_init_project('project', {:deb =>

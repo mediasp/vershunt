@@ -7,19 +7,27 @@ module MSPRelease
       end
 
       attr_reader :changes_file
+
+      def files
+        changes = File.read(changes_file).split("\n")
+        files_start = changes.index {|l| /^Files: $/.match(l) } + 1
+        changes[files_start..-1].map {|l| l.split(" ").last } +
+          [changes_file]
+      end
     end
 
     class NoChangesFileError < StandardError ; end
 
     include Exec::Helpers
 
-    def initialize(basedir, project)
+    def initialize(basedir, project, out=$stdout)
       @basedir = basedir
       @project = project
+      @out = out
     end
 
     def perform_from_cli!
-      $stdout.puts("Building package...")
+      @out.puts("Building package...")
 
       result =
         begin
@@ -33,7 +41,7 @@ module MSPRelease
         end
 
       result.tap do
-        $stdout.puts("Package built: #{result.changes_file}")
+        @out.puts("Package built: #{result.changes_file}")
       end
     end
 
@@ -42,7 +50,7 @@ module MSPRelease
       raise "directory does not exist: #{dir}" unless
         File.directory?(dir)
 
-      e = Exec.new(:name => 'build', :quiet => false, :status => :any)
+      e = Exec.new(:name => 'build', :quiet => false, :status => :any, :output => @out)
       Dir.chdir(dir) do
         e.exec(build_command)
       end
