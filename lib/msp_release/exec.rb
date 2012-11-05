@@ -97,6 +97,8 @@ module MSPRelease
         t2.join
       end
 
+      @last_exitstatus = status.exitstatus
+
       unless expected.nil? || expected.include?(status.exitstatus)
         raise UnexpectedExitStatus.new(expected, status.exitstatus, command, @last_output, @last_stdout, @last_stderr)
       end
