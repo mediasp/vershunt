@@ -60,7 +60,13 @@ information.
         init_commands
 
         Climate.with_standard_exception_handling do
-          Root.run(args)
+          begin
+            Root.run(args)
+          rescue Exec::UnexpectedExitStatus => e
+            $stderr.puts(e.message)
+            $stderr.puts(e.stderr)
+            exit 1
+          end
         end
       end
 
