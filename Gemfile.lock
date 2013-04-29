@@ -1,12 +1,12 @@
 PATH
   remote: .
   specs:
-    vershunt (1.7.0)
+    vershunt (1.8.0)
       POpen4 (~> 0.1.0)
       climate (~> 0.5.0)
 
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
     POpen4 (0.1.4)
       Platform (>= 0.4.0)
