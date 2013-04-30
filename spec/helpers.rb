@@ -22,6 +22,7 @@ shared_context "project_helpers" do
   end
 
   after do
+    FileUtils.rm_rf(@tmpdir)
     @tmpdir = nil
   end
 
@@ -68,7 +69,7 @@ shared_context "project_helpers" do
   end
 
   def create_project_dir(name)
-    @project_dir = FileUtils.mkdir(File.join(@tmpdir, name)).first unless @project_dir
+    @project_dir ||= FileUtils.mkdir(File.join(@tmpdir, name)).first
   end
 
   def write_project(name, to_be_yamled)
