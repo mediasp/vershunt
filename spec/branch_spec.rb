@@ -5,7 +5,7 @@ describe 'branch' do
   include_examples 'project_helpers'
 
   before do
-    init_project('project', {:ruby_version_file => nil,
+    init_debian_project('project', {:ruby_version_file => nil,
         :version => '0.1.0'})
   end
 

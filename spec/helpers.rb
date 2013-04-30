@@ -79,7 +79,7 @@ shared_context "project_helpers" do
     MSPRelease::Project.new_from_project_file(fname)
   end
 
-  def init_project(name, options)
+  def init_debian_project(name, options)
     changelog_path = options.fetch(:changelog_path, "debian/changelog")
     control_path = 'debian/control'
     rules_path = 'debian/rules'
@@ -177,7 +177,7 @@ Description: Core library
   end
 
   def build_init_project(*args)
-    init_project(*args)
+    init_debian_project(*args)
     in_project_dir do |dir|
       Dir.mkdir('bin')
       build_cmd = 'bin/build-debs.sh'

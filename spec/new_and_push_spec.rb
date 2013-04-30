@@ -6,7 +6,7 @@ describe 'creating and pushing releases' do
   describe 'new' do
 
     before do
-      @project = init_project('project', :version => '0.0.1')
+      @project = init_debian_project('project', :version => '0.0.1')
     end
 
     it 'fails if you are not on a release branch' do
@@ -100,7 +100,7 @@ describe 'creating and pushing releases' do
   describe "new releases with ruby != debian version" do
     it "uses the existing debian version where the main parts match" do
 
-      @project = init_project('project', :version => '0.1.0',
+      @project = init_debian_project('project', :version => '0.1.0',
         :changelog_version => '0.1.0-3')
 
       in_project_dir do
@@ -114,7 +114,7 @@ describe 'creating and pushing releases' do
     it "uses the existing debian version where the main parts match, but " +
       "the debian suffix is rubbish" do
 
-      @project = init_project('project', :version => '0.1.0',
+      @project = init_debian_project('project', :version => '0.1.0',
         :changelog_version => '0.1.0~upstreamcats')
 
       in_project_dir do
@@ -127,7 +127,7 @@ describe 'creating and pushing releases' do
     end
 
     it "uses the ruby version over the debian version where they are different" do
-      @project = init_project('project', :version => '0.1.0',
+      @project = init_debian_project('project', :version => '0.1.0',
         :changelog_version => '0.2.0-20120101')
 
       in_project_dir do

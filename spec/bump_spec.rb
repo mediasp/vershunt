@@ -102,7 +102,7 @@ describe 'bump' do
     include_examples 'bump operations'
 
     before do
-      init_project('project', {:ruby_version_file => nil})
+      init_debian_project('project', {:ruby_version_file => nil})
     end
 
   end
@@ -119,7 +119,7 @@ describe 'bump' do
     end
 
     before do
-      init_project('project', {})
+      init_debian_project('project', {})
     end
 
   end
