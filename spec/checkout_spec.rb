@@ -233,7 +233,7 @@ describe 'checkout' do
         last_stdout.should match "project_0.0.1-1.tar.gz"
         last_stdout.should match /project_0\.0\.1\-1\_(.+)\.deb/
         last_stdout.should match /project_0\.0\.1\-1\_(.+)\.changes/
-        last_stdout.should match /project_0\.0\.1\-1\_(.+)\.dsc/
+        last_stdout.should match /project_0.0.1-1.dsc/
       end
     end
 
