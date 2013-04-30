@@ -194,7 +194,7 @@ BASH
   end
 
   def run_msp_release(*args)
-    run File.join(@bin_path, 'msp_release') + " #{args.join(' ')}"
+    run File.join(@bin_path, 'vershunt') + " #{args.join(' ')}"
   end
 
   def write_project_file(fname)
