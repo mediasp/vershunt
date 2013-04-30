@@ -6,8 +6,10 @@ class MSPRelease::Git
       out_to = options[:out_to]
       exec_options = options[:exec] || {}
       depth_arg = options[:depth].nil?? '' : "--depth #{options[:depth]}"
+      no_single_branch = options[:no_single_branch] ? '--no-single-branch' : ''
+
       MSPRelease::Exec.
-        exec("git clone #{depth_arg} #{git_url} #{out_to.nil?? '' : out_to}", exec_options)
+        exec("git clone #{depth_arg} #{no_single_branch} #{git_url} #{out_to.nil?? '' : out_to}", exec_options)
     end
   end
 

@@ -80,7 +80,7 @@ the correct version information in it.
 
       tmp_dir = "vershunt-#{Time.now.to_i}.tmp"
       Git.clone(git_url, {:depth => clone_depth, :out_to => tmp_dir,
-          :exec => {:quiet => true}})
+                :no_single_branch => true, :exec => {:quiet => true}})
 
       project = Project.new_from_project_file(tmp_dir + "/" + Helpers::PROJECT_FILE)
       distribution = options[:distribution] || project.changelog.distribution
