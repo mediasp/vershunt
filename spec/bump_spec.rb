@@ -123,4 +123,20 @@ describe 'bump' do
     end
 
   end
+
+  describe 'on a ruby gems project' do
+
+    include_examples 'bump operations'
+
+    def project_version_should_match(string)
+      run_msp_release 'status'
+      last_run.should exit_with(0)
+      last_stdout.should match(/Project says +: +#{Regexp.escape(string)}/)
+    end
+
+    before do
+      init_gem_project('project', {})
+    end
+
+  end
 end

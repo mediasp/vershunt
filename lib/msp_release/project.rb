@@ -11,14 +11,14 @@ module MSPRelease::Project
       project.extend(Debian)
     end
 
+    # If there is a gemspec, treat it as a gem project.
+    if Dir.glob("#{dirname}/*.gemspec").count > 0
+      project.extend(Gem)
+    end
+
     if config[:ruby_version_file]
       project.extend(Ruby)
     end
-
-    # if File.exists?(File.join(dirname, '*.gemspec'))
-      # TODO: implement Gem style projects
-      # project.extend(Gem)
-    # end
 
     project
   end
@@ -28,4 +28,5 @@ end
 require 'msp_release/project/base'
 require 'msp_release/project/ruby'
 require 'msp_release/project/debian'
+require 'msp_release/project/gem'
 

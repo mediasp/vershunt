@@ -12,10 +12,6 @@ class MSPRelease::Project::Base
     end
   end
 
-  def release_name(release_data)
-    raise NotImplementedError
-  end
-
   def release_name_from_message(commit_message)
     idx = commit_message.index(RELEASE_COMMIT_PREFIX)
     return nil unless idx == 0
@@ -42,11 +38,9 @@ class MSPRelease::Project::Base
   end
 
   def version
-    # raise NotImplementedError
   end
 
   def write_version(segment)
-    # raise NotImplementedError
   end
 
   def bump_version(segment)

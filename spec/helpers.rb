@@ -182,6 +182,16 @@ Description: Core library
     version = options.fetch(:version, '0.0.1')
 
     create_project_dir(name)
+    gemspec_path = File.join(@project_dir, gemspec_file)
+    @remote_repo = File.expand_path(@project_dir + "/../#{name}-remote.git")
+    Dir.chdir(@project_dir + '/..') do
+      exec "git init --bare #{@remote_repo}"
+    end
+
+    in_project_dir(name) do
+      exec "git clone #{@remote_repo} ."
+    end
+
 
     project = write_project name, ruby_version_file.nil?? {} :
       {:ruby_version_file => ruby_version_file}
@@ -200,7 +210,7 @@ Description: Core library
 require 'lib/#{name}/version'
 
 spec = Gem::Specification.new do |s|
-  s.name = #{name}
+  s.name = '#{name}'
   s.version = #{name.capitalize}::VERSION
   s.authors = ["Joe Bloggs"]
   s.email = ["joebloggs@example.com"]
@@ -211,6 +221,12 @@ spec = Gem::Specification.new do |s|
   s.rubygems_version = "1.3.5"
 end
 GEMSPEC
+    end
+
+    in_project_dir('project') do
+      exec "git add .msp_project #{ruby_version_file} #{gemspec_path}"
+      exec "git commit -m 'initial commit'"
+      exec "git push origin master:master"
     end
 
     project

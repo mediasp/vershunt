@@ -13,11 +13,14 @@ module MSPRelease
         puts "Awaiting push.  Please update the changelog, then run vershunt push "
         bits.push(["Pending", data[:version]])
       else
-        changelog_version = changelog.version
-
         bits.push(["Project says", msp_version]) if msp_version
         bits.push(["Release branch", on_release_branch?? git_version : nil])
-        bits.push(["Changelog says", changelog_version])
+
+        if changelog
+          changelog_version = changelog.version
+          bits.push(["Changelog says", changelog_version])
+        end
+
       end
 
       bits.push(["Release commit", release_name_for_output])

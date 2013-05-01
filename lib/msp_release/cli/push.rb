@@ -14,9 +14,10 @@ module MSPRelease
       release_name = "#{data[:version]}"
       tagname = "release-#{release_name}"
 
-      commit_message = project.release_commit_message(release_name)
-      exec "git add #{changelog.fname}"
-      exec "git commit -m\"#{commit_message}\""
+      if project.respond_to?(:project_specific_push)
+        project.project_specific_push(release_name)
+      end
+
       exec "git tag #{tagname}"
       exec "git push origin #{git.cur_branch}"
       stdout.puts "Pushing new release tag: #{tagname}"

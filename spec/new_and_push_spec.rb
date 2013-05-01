@@ -5,96 +5,138 @@ describe 'creating and pushing releases' do
 
   describe 'new' do
 
-    before do
-      @project = init_debian_project('project', :version => '0.0.1')
+    shared_examples 'new operations' do
+
+      it 'fails if you are not on a release branch' do
+        in_project_dir do |dir|
+          run_msp_release 'new'
+          last_run.should exit_with(1)
+          last_stderr.should include('You must be on a release branch to create release commits')
+        end
+      end
+
+      it 'succeeds if you are not on a release branch, but you supply --force' do
+        in_project_dir do |dir|
+          run_msp_release 'new --force'
+          last_run.should exit_with(0)
+          last_stderr.should include("Not on a release branch, forcing creation of release commit.")
+          # last_stdout.should include("Changelog now at 0.0.1-1\n")
+        end
+      end
+
+      it 'will not let you create a release commit if you have an operation pending' do
+        in_project_dir 'project' do |dir|
+          run_msp_release 'branch'
+          run_msp_release 'new'
+          last_run.should exit_with(0)
+
+          run_msp_release 'new'
+          last_run.should exit_with(1)
+          last_stderr.should include('You have a release commit pending to be pushed')
+        end
+      end
+
     end
 
-    it 'fails if you are not on a release branch' do
-      in_project_dir do |dir|
-        run_msp_release 'new'
-        last_run.should exit_with(1)
-        last_stderr.should include('You must be on a release branch to create release commits')
+    describe 'debian project' do
+      include_examples 'new operations'
+
+      it 'creates a -1 release on a release branch' do
+        in_project_dir do |dir|
+          run_msp_release 'branch'
+          last_run.should exit_with(0)
+
+          run_msp_release 'new'
+
+          last_run.should exit_with(0)
+          last_stdout.should include("Changelog now at 0.0.1-1\n")
+        end
+      end
+
+      it 'can create a subsequent -2 release on a release branch' do
+        in_project_dir do
+          run_msp_release 'branch'
+          run_msp_release 'new'
+
+          last_stdout.should include('Changelog now at 0.0.1-1')
+
+          run_msp_release 'push'
+          last_run.should exit_with(0)
+
+          run_msp_release 'new'
+          last_run.should exit_with(0)
+          last_stdout.should include('Changelog now at 0.0.1-2')
+        end
+      end
+
+      it 'lets you change the target distribution using --debian-distribution=' do
+        in_project_dir do |dir|
+          run_msp_release 'branch'
+          last_run.should exit_with(0)
+
+          run_msp_release 'new --debian-distribution=fakedist'
+
+          last_run.should exit_with(0)
+          last_stdout.should include("Changelog now at 0.0.1-1\n")
+
+          File.read('debian/changelog').first.strip.should ==
+            "project (0.0.1-1) fakedist; urgency=low"
+        end
+      end
+
+      it 'respects any previous change to the distribution' do
+        in_project_dir do |dir|
+          run_msp_release 'branch'
+          last_run.should exit_with(0)
+
+          run_msp_release 'new --debian-distribution=fakedist'
+          run_msp_release 'push'
+          run_msp_release 'new'
+
+          last_stdout.should include("Changelog now at 0.0.1-2\n")
+          File.read('debian/changelog').first.strip.should ==
+            "project (0.0.1-2) fakedist; urgency=low"
+        end
+      end
+
+      before do
+        @project = init_debian_project('project', :version => '0.0.1')
       end
     end
 
-    it 'succeeds if you are not on a release branch, but you supply --force' do
-      in_project_dir do |dir|
-        run_msp_release 'new --force'
-        last_run.should exit_with(0)
-        last_stderr.should include("Not on a release branch, forcing creation of release commit.")
-        last_stdout.should include("Changelog now at 0.0.1-1\n")
+    describe 'gem project' do
+      include_examples 'new operations'
+
+      it 'allows you to create a release on a release branch' do
+        in_project_dir do |dir|
+          run_msp_release 'branch'
+          last_run.should exit_with(0)
+
+          run_msp_release 'new'
+
+          last_run.should exit_with(0)
+        end
+      end
+
+      it 'cannot re-release same version without bumping' do
+        in_project_dir do
+          run_msp_release 'branch'
+          run_msp_release 'new'
+
+          run_msp_release 'push'
+          last_run.should exit_with(0)
+
+          run_msp_release 'new'
+          last_run.should exit_with(1)
+          last_stderr.should include('Tag release-0.0.1 already exists, you must bump the version before the next release')
+        end
+      end
+
+      before do
+        @project = init_gem_project('project', :version => '0.0.1')
       end
     end
 
-    it 'creates a -1 release on a release branch' do
-      in_project_dir do |dir|
-        run_msp_release 'branch'
-        last_run.should exit_with(0)
-
-        run_msp_release 'new'
-
-        last_run.should exit_with(0)
-        last_stdout.should include("Changelog now at 0.0.1-1\n")
-      end
-    end
-
-    it 'will not let you create a release commit if you have an operation pending' do
-      in_project_dir 'project' do |dir|
-        run_msp_release 'branch'
-        run_msp_release 'new'
-        last_run.should exit_with(0)
-
-        run_msp_release 'new'
-        last_run.should exit_with(1)
-        last_stderr.should include('You have a release commit pending to be pushed')
-      end
-    end
-
-    it 'can create a subsequent -2 release on a release branch' do
-      in_project_dir do
-        run_msp_release 'branch'
-        run_msp_release 'new'
-
-        last_stdout.should include('Changelog now at 0.0.1-1')
-
-        run_msp_release 'push'
-        last_run.should exit_with(0)
-
-        run_msp_release 'new'
-        last_run.should exit_with(0)
-        last_stdout.should include('Changelog now at 0.0.1-2')
-      end
-    end
-
-    it 'lets you change the target distribution using --debian-distribution=' do
-      in_project_dir do |dir|
-        run_msp_release 'branch'
-        last_run.should exit_with(0)
-
-        run_msp_release 'new --debian-distribution=fakedist'
-
-        last_run.should exit_with(0)
-        last_stdout.should include("Changelog now at 0.0.1-1\n")
-
-        File.read('debian/changelog').first.strip.should ==
-          "project (0.0.1-1) fakedist; urgency=low"
-      end
-    end
-
-    it 'respects any previous change to the distribution' do
-      in_project_dir do |dir|
-        run_msp_release 'branch'
-        last_run.should exit_with(0)
-
-        run_msp_release 'new --debian-distribution=fakedist'
-        run_msp_release 'push'
-        run_msp_release 'new'
-
-        last_stdout.should include("Changelog now at 0.0.1-2\n")
-        File.read('debian/changelog').first.strip.should ==
-          "project (0.0.1-2) fakedist; urgency=low"
-      end
-    end
   end
 
   describe "new releases with ruby != debian version" do

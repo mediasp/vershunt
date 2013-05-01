@@ -47,10 +47,16 @@ describe 'MSPRelease::Project' do
       end
     end
 
-    xit 'can return the name of the gem' do
+    it 'can return the gemspec file name' do
+      in_project_dir do
+        project.gemspec_file.should match /gem_project.gemspec$/
+      end
     end
 
-    xit 'can return the gemspec object' do
+    it 'can return the name of the gem' do
+      in_project_dir do
+        project.gemspec_name.should == 'gem_project'
+      end
     end
 
   end

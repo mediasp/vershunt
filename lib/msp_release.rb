@@ -42,7 +42,9 @@ module MSPRelease
     end
 
     def changelog
-      @changelog ||= project.changelog
+      @changelog ||= begin
+        project.respond_to?(:changelog) && project.changelog
+      end
     end
 
     def on_release_branch?
@@ -71,10 +73,6 @@ module MSPRelease
 
     def remove_data
       File.delete(DATAFILE) if File.exists?(DATAFILE)
-    end
-
-    def puts_changelog_info
-      puts "OK, please update the change log, then run 'vershunt push' to push your changes for building"
     end
 
     def fail_if_modified_wc
