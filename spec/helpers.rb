@@ -176,6 +176,46 @@ Description: Core library
     project
   end
 
+  def init_gem_project(name, options)
+    ruby_version_file = options.fetch(:ruby_version_file, "lib/#{name}/version.rb")
+    gemspec_file = "#{name}.gemspec"
+    version = options.fetch(:version, '0.0.1')
+
+    create_project_dir(name)
+
+    project = write_project name, ruby_version_file.nil?? {} :
+      {:ruby_version_file => ruby_version_file}
+
+    if ruby_version_file
+      FileUtils.mkdir_p(File.join(@project_dir, File.dirname(ruby_version_file)))
+      File.open(File.join(@project_dir, ruby_version_file), 'w') do |f|
+        f.puts('module SomeModule')
+        f.puts("  VERSION = '#{version}'")
+        f.puts('end')
+      end
+    end
+
+    File.open(File.join(@project_dir, gemspec_file), 'w') do |f|
+      f.write <<GEMSPEC
+require 'lib/#{name}/version'
+
+spec = Gem::Specification.new do |s|
+  s.name = #{name}
+  s.version = #{name.capitalize}::VERSION
+  s.authors = ["Joe Bloggs"]
+  s.email = ["joebloggs@example.com"]
+  s.summary = 'example gem project'
+  s.description = 'Example Gem project to test vershunt'
+  s.files = Dir["lib/**/*.rb"]
+  s.require_paths = ["lib"]
+  s.rubygems_version = "1.3.5"
+end
+GEMSPEC
+    end
+
+    project
+  end
+
   def build_init_project(*args)
     init_debian_project(*args)
     in_project_dir do |dir|
