@@ -33,7 +33,7 @@ describe 'msp_release status' do
 
   describe 'gem', self do
     before do
-      init_debian_project 'project', {:version => '0.0.1'}
+      init_gem_project 'project', {:version => '0.0.1'}
     end
 
     it 'does not show any release commit information if you are not on a release commit' do

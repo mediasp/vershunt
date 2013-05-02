@@ -18,6 +18,7 @@ class MSPRelease::Git
   end
 
   class Commit
+    include MSPRelease::Exec::Helpers
     attr_reader :message
     attr_reader :author
     attr_reader :hash
@@ -30,11 +31,16 @@ class MSPRelease::Git
     end
 
     def release_commit?
-      !! release_name
+      !! (release_name || tag)
+    end
+
+    def tag
+      tag = exec "git tag --contains #{hash}"
+      (m = /^release-([0-9.]*)$/.match(tag)) && m[1]
     end
 
     def release_name
-      @project.release_name_from_message(message)
+      @project.release_name_from_message(message) || tag
     end
   end
 
@@ -55,6 +61,10 @@ class MSPRelease::Git
 
   def cur_branch
     /^\* (.+)$/.match(exec "git branch")[1]
+  end
+
+  def last_release_tag
+    a = exec "git describe --tags --match 'release-*'"
   end
 
   def branch_exists?(branch_name)
