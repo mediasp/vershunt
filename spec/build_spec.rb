@@ -13,7 +13,10 @@ describe 'build' do
   end
 
   describe "no arguments given" do
-    it "fails, at least a repository arg is required"
+    it "fails, at least a repository arg is required" do
+      run_msp_release "build --verbose"
+      last_run.should exit_with(1)
+    end
   end
 
   def build_products
