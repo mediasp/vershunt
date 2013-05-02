@@ -2,14 +2,7 @@ require 'spec/helpers'
 
 describe 'branch' do
 
-  include_examples 'project_helpers'
-
-  before do
-    init_debian_project('project', {:ruby_version_file => nil,
-        :version => '0.1.0'})
-  end
-
-  describe 'on master' do
+  shared_examples 'on master' do
 
     it 'will create a release branch automatically bumping the minor' +
       'version on master and pushing it behind the release branch' do
@@ -107,6 +100,27 @@ describe 'branch' do
       end
     end
 
+  end
+
+  include_context 'project_helpers'
+
+  describe 'debian project' do
+
+    include_examples "on master"
+
+    before do
+      init_debian_project('project', {:ruby_version_file => nil,
+                          :version => '0.1.0'})
+    end
+  end
+
+  describe 'gem project' do
+
+    include_examples "on master"
+
+    before do
+      init_gem_project('project', {:version => '0.1.0'})
+    end
   end
 
 end

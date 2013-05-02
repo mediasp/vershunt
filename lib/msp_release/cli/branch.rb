@@ -35,7 +35,7 @@ The minor version on master is bumped after the branch is created, although this
       fail_if_push_pending
 
       # take the version before we do any bumping
-      version = project.any_version
+      version = project.version
 
       branch_from =
         if git.on_master?
