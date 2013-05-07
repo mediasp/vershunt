@@ -63,7 +63,8 @@ module MSPRelease
     end
 
     def puts_changelog_info
-      $stdout.puts "OK, please update the change log, then run 'vershunt push' to push your changes for building"
+      LOG.debug "OK, please update the change log, then run 'vershunt push' to"\
+        " push your changes for building"
     end
 
     def project_specific_push(release_name)

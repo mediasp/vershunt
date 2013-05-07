@@ -79,15 +79,17 @@ updated all version information.
       tar_it           = options[:tar]
       clone_depth      = options[:shallow] ? CLONE_DEPTH : nil
 
+      LOG.verbose if options[:noise]
+
       branch_name = release_spec_arg || 'master'
       pathspec = "origin/#{branch_name}"
       branch_is_release_branch = !! /^release-.+$/.match(branch_name)
 
       shallow_output = clone_depth.nil?? '' : ' (shallow)'
       if release_spec_arg && branch_is_release_branch
-        log("Checking out latest release commit from #{pathspec}#{shallow_output}")
+        LOG.debug("Checking out latest release commit from #{pathspec}#{shallow_output}")
       else
-        log("Checking out latest commit from #{pathspec}#{shallow_output}")
+        LOG.debug("Checking out latest commit from #{pathspec}#{shallow_output}")
       end
 
       tmp_dir = "vershunt-#{Time.now.to_i}.tmp"
@@ -123,12 +125,11 @@ updated all version information.
 
       FileUtils.mv(tmp_dir, src_dir)
       project = Project.new_from_project_file(src_dir + "/" + Helpers::PROJECT_FILE)
-      log("Checked out to #{src_dir}")
+      LOG.debug("Checked out to #{src_dir}")
 
       if do_build
-        log("Building package...")
-        out = noisy?? stdout : StringIO.new
-        build = Build.new(src_dir, project, :out => out, :sign => options[:sign])
+        LOG.debug("Building package...")
+        build = Build.new(src_dir, project, :sign => options[:sign])
 
         result = build.perform_from_cli!
         if print_files?
@@ -144,20 +145,12 @@ updated all version information.
       files = result.files
       tarfile = "#{project.source_package_name}-#{project.changelog.version}.tar"
       exec("tar -cf #{tarfile} #{files.join(' ')}")
-      log("Build products archived in to #{tarfile}")
+      LOG.debug("Build products archived in to #{tarfile}")
       stdout.puts(tarfile) if print_files?
     end
 
     def print_files?
       options[:print_files]
-    end
-
-    def noisy?
-      options[:noise]
-    end
-
-    def log(message)
-      stdout.puts(message) if noisy?
     end
 
     def oneline_pattern

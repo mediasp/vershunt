@@ -24,6 +24,8 @@ module MSPRelease
       fail_if_modified_wc
       fail_unless_on_release_branch
 
+      LOG.verbose
+
       new_version = project.next_version_for_release(options)
 
       self.data = {:version => new_version}
@@ -39,7 +41,7 @@ module MSPRelease
     def fail_unless_on_release_branch
       if git.cur_branch != project.branch_name
         if options[:force]
-          stderr.puts("Not on a release branch, forcing creation of release " +
+          LOG.error("Not on a release branch, forcing creation of release " +
             "commit.  #{git.cur_branch} != #{project.branch_name}")
         else
           raise CLI::Exit, not_on_release_branch_msg

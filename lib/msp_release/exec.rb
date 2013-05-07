@@ -68,6 +68,8 @@ module MSPRelease
       @last_stderr = ""
       @last_output = ""
 
+      output = options[:output]
+
       output_semaphore = Mutex.new
 
       start = name.nil? ? '' : "#{name}: "
@@ -77,7 +79,8 @@ module MSPRelease
           stdout.each_line do |line|
             @last_stdout += line
             output_semaphore.synchronize { @last_output += line }
-            LOG.debug("#{start}#{line}")
+            msg = "#{start}#{line}"
+            (output && !options[:quiet]) ? output.puts(msg) : LOG.debug(msg)
           end
         end
 
@@ -85,7 +88,8 @@ module MSPRelease
           stderr.each_line do |line|
             @last_stderr += line
             output_semaphore.synchronize { @last_output += line }
-            LOG.error("#{start}#{line}")
+            msg = "#{start}#{line}"
+            (output && !options[:quiet]) ? output.puts(msg) : LOG.error(msg)
           end
         end
 

@@ -3,7 +3,7 @@ module MSPRelease
   class Log
     @@log_levels = {
       :error => $stderr,
-      :warn => StringIO.new,
+      :warn => $stderr,
       :info => $stdout,
       :debug => StringIO.new,
       :trace => StringIO.new
