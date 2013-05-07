@@ -28,10 +28,12 @@ module MSPRelease::Project::Ruby
   end
 
   def version
-    File.open(ruby_version_file, 'r') do |f|
-      v_line = f.readlines.map {|l|version_pattern.match(l)}.compact.first
-      raise "Couldn't parse version from #{ruby_version_file}" unless v_line
-      MSPRelease::Version.new(* (1..3).map {|i|v_line[i]} )
+    Dir.chdir(@dir) do
+      File.open(ruby_version_file, 'r') do |f|
+        v_line = f.readlines.map {|l|version_pattern.match(l)}.compact.first
+        raise "Couldn't parse version from #{ruby_version_file}" unless v_line
+        MSPRelease::Version.new(* (1..3).map {|i|v_line[i]} )
+      end
     end
   end
 

@@ -4,6 +4,47 @@
 module MSPRelease
   module Project::Debian
 
+    class BuildResult
+      def initialize(dir, project)
+        @dir = dir
+        @project = project
+
+        looking_for = project.changelog.version.to_s
+        changes_file = find_changes_file(looking_for)
+        if changes_file && File.exists?(changes_file)
+          @changes_file = changes_file
+        else
+          raise NoChangesFileError, looking_for
+        end
+      end
+
+      attr_reader :changes_file
+
+      alias :package :changes_file
+
+      def files
+        dir = File.dirname(changes_file)
+        changes = File.read(changes_file).split("\n")
+        files_start = changes.index {|l| /^Files: $/.match(l) } + 1
+        changes[files_start..-1].map {|l| File.join(dir, l.split(" ").last) } +
+          [changes_file]
+      end
+
+      def available_changes_files
+        Dir["#{@dir}/*.changes"]
+      end
+
+      def changes_pattern
+        /#{@project.source_package_name}_([^_]+)_([^\.]+)\.changes/
+      end
+
+      def find_changes_file(version_string)
+        available_changes_files.find { |fname|
+          (m = changes_pattern.match(File.basename(fname))) && m && (m[1] == version_string)
+        }
+      end
+    end
+
     DEFAULT_PATH = "debian/msp/changelog"
 
     def write_version(new_version)
@@ -107,17 +148,21 @@ module MSPRelease
       @dir = new_dir
     end
 
-    def build(options={})
-      LOG.debug("Checked out to #{@dir}")
+    def build_opts(options={})
+      @sign = options[:sign]
+    end
 
-      LOG.debug("Building package...")
-      build = Build.new(@dir, self, :output_to_stderr => !!options[:noisy], :sign => options[:sign])
+    def build_command(options={})
+      if cmd = config[:deb_build_command]
+        cmd
+      else
+        "dpkg-buildpackage" + (@sign ? '' : ' -us -uc')
+      end
+    end
 
-      result = build.perform_from_cli!
-      LOG.debug("Build products:")
-      result.files.each {|f| LOG.info(f) }
+    def build_result(dir)
+      BuildResult.new(dir, self)
     end
 
   end
-
 end

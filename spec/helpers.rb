@@ -178,6 +178,9 @@ Description: Core library
 
   def init_gem_project(name, options)
     ruby_version_file = options.fetch(:ruby_version_file, "lib/#{name}/version.rb")
+
+    camel_name = name.split('_').map {|c| c.capitalize }.join
+
     gemspec_file = "#{name}.gemspec"
     version = options.fetch(:version, '0.0.1')
 
@@ -199,7 +202,7 @@ Description: Core library
     if ruby_version_file
       FileUtils.mkdir_p(File.join(@project_dir, File.dirname(ruby_version_file)))
       File.open(File.join(@project_dir, ruby_version_file), 'w') do |f|
-        f.puts('module SomeModule')
+        f.puts("module #{camel_name}")
         f.puts("  VERSION = '#{version}'")
         f.puts('end')
       end
@@ -211,7 +214,7 @@ require 'lib/#{name}/version'
 
 spec = Gem::Specification.new do |s|
   s.name = '#{name}'
-  s.version = #{name.capitalize}::VERSION
+  s.version = #{camel_name}::VERSION
   s.authors = ["Joe Bloggs"]
   s.email = ["joebloggs@example.com"]
   s.summary = 'example gem project'
