@@ -26,12 +26,11 @@ module MSPRelease
       @project = project
       @options = options
 
-      @out = options[:out] || $stdout
       @sign = options.fetch(:sign, true)
     end
 
     def perform_from_cli!
-      @out.puts("Building package...")
+      LOG.debug("Building package...")
 
       result =
         begin
@@ -45,7 +44,7 @@ module MSPRelease
         end
 
       result.tap do
-        @out.puts("Package built: #{result.changes_file}")
+        LOG.debug("Package built: #{result.changes_file}")
       end
     end
 
@@ -54,13 +53,13 @@ module MSPRelease
       raise "directory does not exist: #{dir}" unless
         File.directory?(dir)
 
-      e = Exec.new(:name => 'build', :quiet => false, :status => :any, :output => @out)
+      e = Exec.new(:name => 'build', :quiet => false, :status => :any)
       Dir.chdir(dir) do
         e.exec(build_command)
       end
 
       if e.last_exitstatus != 0
-        $stderr.puts("Warning: #{build_command} exited with #{e.last_exitstatus}")
+        LOG.warn("Warning: #{build_command} exited with #{e.last_exitstatus}")
       end
 
       looking_for = @project.changelog.version.to_s

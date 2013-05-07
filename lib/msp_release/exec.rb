@@ -39,13 +39,9 @@ module MSPRelease
     end
 
     attr_reader :name
-    attr_reader :quiet
-    alias :quiet? :quiet
 
     def initialize(options={})
       @name   = options.fetch(:name,   nil)
-      @quiet  = options.fetch(:quiet,  true)
-      @output = options.fetch(:output, $stdout)
     end
 
     def last_stdout
@@ -81,7 +77,7 @@ module MSPRelease
           stdout.each_line do |line|
             @last_stdout += line
             output_semaphore.synchronize { @last_output += line }
-            @output.puts("#{start}#{line}") unless quiet?
+            LOG.debug("#{start}#{line}")
           end
         end
 
@@ -89,7 +85,7 @@ module MSPRelease
           stderr.each_line do |line|
             @last_stderr += line
             output_semaphore.synchronize { @last_output += line }
-            @output.puts("#{start}#{line}") unless quiet?
+            LOG.error("#{start}#{line}")
           end
         end
 

@@ -24,6 +24,10 @@ module MSPRelease::Project::Gem
     $2
   end
 
+  def name
+    gemspec_name
+  end
+
   def next_version_for_release(options={})
     tag = "release-#{version}"
     check_tag = exec("git show-ref --tags #{tag}", :status => [0,1])

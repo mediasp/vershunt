@@ -95,6 +95,7 @@ module MSPRelease
 
   include Helpers
 
+  require 'msp_release/log'
   require 'msp_release/debian'
   require 'msp_release/git'
   require 'msp_release/options'
@@ -103,9 +104,10 @@ module MSPRelease
   require 'msp_release/make_branch'
   require 'msp_release/cli'
 
-
   MSP_VERSION_FILE = "lib/msp/version.rb"
   DATAFILE = ".msp_release"
+
+  LOG = Log.new
 
   VERSION_SEGMENTS = [:major, :minor, :bugfix]
   Version = Struct.new(*VERSION_SEGMENTS)

@@ -1,5 +1,7 @@
 class MSPRelease::Project::Base
 
+  include MSPRelease::Exec::Helpers
+
   RELEASE_COMMIT_PREFIX = "RELEASE COMMIT - "
 
   attr_reader :config, :config_file
