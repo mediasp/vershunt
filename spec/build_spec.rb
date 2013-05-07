@@ -37,7 +37,7 @@ describe 'build' do
 
       it "checks out the latest commint from master then builds from it" do
         in_tmp_dir do
-          run_msp_release "build --verbose #{@remote_repo}"
+          run_msp_release "build --verbose file:///#{@remote_repo}"
 
           last_run.should exit_with(0)
         end
