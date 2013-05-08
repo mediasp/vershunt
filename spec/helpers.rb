@@ -185,7 +185,7 @@ Description: Core library
     FileUtils.mkdir_p(File.join(dir, File.dirname(ruby_version_file)))
     File.open(File.join(dir, ruby_version_file), 'w') do |f|
       f.puts("module #{camel_name(name)}")
-      f.puts("  VERSION = '#{version}'")
+      f.puts("  VERSION = \"#{version}\"")
       f.puts('end')
     end
   end

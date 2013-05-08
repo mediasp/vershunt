@@ -7,14 +7,14 @@ module MSPRelease::Project::Ruby
   attr_reader :ruby_version_file
 
   def version_pattern
-    /VERSION = '([0-9]+)\.([0-9]+)\.([0-9]+)'/
+    /VERSION *= *(['"])([0-9]+)\.([0-9]+)\.([0-9]+)\1/
   end
 
   def write_version(new_version)
     lines = File.open(ruby_version_file, 'r')  { |f| f.readlines }
     lines = lines.map do |line|
       if match = version_pattern.match(line)
-        line.gsub(/( *VERSION = )'.+'$/, "\\1'#{new_version.to_s}'")
+        line.gsub(/( *VERSION *= *)(['"]).+\2$/, "\\1\\2#{new_version.to_s}\\2")
       else
         line
       end
@@ -32,7 +32,7 @@ module MSPRelease::Project::Ruby
       File.open(ruby_version_file, 'r') do |f|
         v_line = f.readlines.map {|l|version_pattern.match(l)}.compact.first
         raise "Couldn't parse version from #{ruby_version_file}" unless v_line
-        MSPRelease::Version.new(* (1..3).map {|i|v_line[i]} )
+        MSPRelease::Version.new(* (2..4).map {|i|v_line[i]} )
       end
     end
   end
