@@ -88,6 +88,7 @@ shared_context "project_helpers" do
     status = options.fetch(:status, :Dev)
     version = options.fetch(:version, '0.0.1')
     changelog_version = options[:changelog_version] || version
+    gem_project = options.fetch(:gem_project, false)
 
     create_project_dir(name)
     @remote_repo = File.expand_path(@project_dir + "/../#{name}-remote.git")
@@ -112,12 +113,7 @@ shared_context "project_helpers" do
       {:ruby_version_file => ruby_version_file})
 
     if ruby_version_file
-      FileUtils.mkdir_p(File.join(@project_dir, File.dirname(ruby_version_file)))
-      File.open(File.join(@project_dir, ruby_version_file), 'w') do |f|
-        f.puts('module SomeModule')
-        f.puts("  VERSION = '#{version}'")
-        f.puts('end')
-      end
+      write_ruby_version(ruby_version_file, @project_dir, name, version)
     end
 
     write_project_file changelog_path do |f|
@@ -165,10 +161,15 @@ Description: Core library
 """)
     end
 
+    gemspec_path = gem_project && write_gemspec(@project_dir, name)
+
     FileUtils.chmod(0755, rules_path)
 
     in_project_dir('project') do
       exec "git add .msp_project #{changelog_path} #{ruby_version_file} #{control_path} #{rules_path} #{compat_path}"
+      if gemspec_path
+        exec "git add .msp_project #{gemspec_path}"
+      end
       exec "git commit -m 'initial commit'"
       exec "git push origin master:master"
     end
@@ -176,45 +177,28 @@ Description: Core library
     project
   end
 
-  def init_gem_project(name, options)
-    ruby_version_file = options.fetch(:ruby_version_file, "lib/#{name}/version.rb")
+  def camel_name(name)
+    name.split('_').map {|c| c.capitalize }.join
+  end
 
-    camel_name = name.split('_').map {|c| c.capitalize }.join
+  def write_ruby_version(ruby_version_file, dir, name, version)
+    FileUtils.mkdir_p(File.join(dir, File.dirname(ruby_version_file)))
+    File.open(File.join(dir, ruby_version_file), 'w') do |f|
+      f.puts("module #{camel_name(name)}")
+      f.puts("  VERSION = '#{version}'")
+      f.puts('end')
+    end
+  end
 
+  def write_gemspec(dir, name)
     gemspec_file = "#{name}.gemspec"
-    version = options.fetch(:version, '0.0.1')
-
-    create_project_dir(name)
-    gemspec_path = File.join(@project_dir, gemspec_file)
-    @remote_repo = File.expand_path(@project_dir + "/../#{name}-remote.git")
-    Dir.chdir(@project_dir + '/..') do
-      exec "git init --bare #{@remote_repo}"
-    end
-
-    in_project_dir(name) do
-      exec "git clone #{@remote_repo} ."
-    end
-
-
-    project = write_project name, ruby_version_file.nil?? {} :
-      {:ruby_version_file => ruby_version_file}
-
-    if ruby_version_file
-      FileUtils.mkdir_p(File.join(@project_dir, File.dirname(ruby_version_file)))
-      File.open(File.join(@project_dir, ruby_version_file), 'w') do |f|
-        f.puts("module #{camel_name}")
-        f.puts("  VERSION = '#{version}'")
-        f.puts('end')
-      end
-    end
-
-    File.open(File.join(@project_dir, gemspec_file), 'w') do |f|
+    File.open(File.join(dir, gemspec_file), 'w') do |f|
       f.write <<GEMSPEC
 require 'lib/#{name}/version'
 
 spec = Gem::Specification.new do |s|
   s.name = '#{name}'
-  s.version = #{camel_name}::VERSION
+  s.version = #{camel_name(name)}::VERSION
   s.authors = ["Joe Bloggs"]
   s.email = ["joebloggs@example.com"]
   s.summary = 'example gem project'
@@ -225,6 +209,31 @@ spec = Gem::Specification.new do |s|
 end
 GEMSPEC
     end
+    File.join(dir, gemspec_file)
+  end
+
+  def init_gem_project(name, options)
+    ruby_version_file = options.fetch(:ruby_version_file, "lib/#{name}/version.rb")
+
+    version = options.fetch(:version, '0.0.1')
+
+    create_project_dir(name)
+    @remote_repo = File.expand_path(@project_dir + "/../#{name}-remote.git")
+    Dir.chdir(@project_dir + '/..') do
+      exec "git init --bare #{@remote_repo}"
+    end
+
+    in_project_dir(name) do
+      exec "git clone #{@remote_repo} ."
+    end
+
+    project = write_project name, ruby_version_file.nil?? {} :
+      {:ruby_version_file => ruby_version_file}
+
+    if ruby_version_file
+      write_ruby_version(ruby_version_file, @project_dir, name, version)
+    end
+    gemspec_path = write_gemspec(@project_dir, name)
 
     in_project_dir('project') do
       exec "git add .msp_project #{ruby_version_file} #{gemspec_path}"

@@ -12,12 +12,8 @@ module MSPRelease::Project
     # If the directory has a debian folder, treat it as a debian project.
     if File.directory?(File.join(dirname, 'debian'))
       project.extend(Debian)
-    end
-
-    # If there is a gemspec, treat it as a gem project.
-    if Dir.glob("#{dirname}/*.gemspec").count > 0
+    elsif Dir.glob("#{dirname}/*.gemspec").count > 0
       project.extend(Gem)
-
       # If its a gem project, it must also be a ruby project.
       project.extend(Ruby)
     end

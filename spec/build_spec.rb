@@ -79,6 +79,41 @@ describe 'build' do
     end
   end
 
+  describe "debian and gem" do
+    before do
+      build_init_project('project', :gem_project => true)
+    end
+
+    it "checks out the latest commit from master then builds from it, giving " +
+      "the build a development version string" do
+
+      in_tmp_dir do
+        run_msp_release "build --verbose file:///#{@remote_repo}"
+
+        last_run.should exit_with(0)
+        last_stdout.should match("Checking out latest commit from origin/master")
+        version_regex = /Checked out to project\-([0-9]{14}-git\+[a-f0-9]{6}~master)/
+          last_stdout.should match(version_regex)
+
+        package_built_regex =
+          /\/(project\_#{dev_version_regex}_[a-z0-9]+.changes)$/
+
+          build_products.any? {|f| package_built_regex.match(f)}.should be_true
+        build_products.each {|f| File.exists?(f).should be_true }
+
+        package_version = version_regex.match(last_stdout)[1]
+        full_package_name = 'project-' + package_version
+
+        File.directory?(full_package_name).should be_true
+        Dir.chdir full_package_name do
+          run_msp_release 'status'
+          last_run.should exit_with(0)
+          last_stdout.should include("Changelog says : #{package_version}")
+        end
+      end
+    end
+  end
+
   describe "debian" do
     describe "only repository argument given" do
 
