@@ -22,7 +22,9 @@ module MSPRelease
 
       new_version, *changed_files = project.bump_version(segment)
 
-      [project.config_file, *changed_files].each do |file|
+      files = [project.config_file, *changed_files].compact
+
+      files.each do |file|
         exec "git add #{file}"
       end
       exec "git commit -m 'BUMPED VERSION TO #{new_version}'"

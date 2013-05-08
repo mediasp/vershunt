@@ -4,7 +4,7 @@ module MSPRelease::Project
     config = YAML.load_file(filename)
     dirname = File.expand_path(File.dirname(filename))
 
-    project = Base.new(config, dirname)
+    project = Base.new(filename, dirname)
 
     # TODO: make it so that this doesn't have to know about all the possible
     # mixins.

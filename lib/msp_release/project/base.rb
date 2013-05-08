@@ -7,9 +7,10 @@ module MSPRelease
 
     attr_reader :config, :config_file, :dir
 
-    def initialize(config, dir='.')
+    def initialize(filename, dir='.')
+      @config_file = filename
       @dir = dir
-      @config = config
+      @config = YAML.load_file(@config_file)
       config.each do |key, value|
         instance_variable_set("@#{key}", value)
       end
@@ -33,12 +34,6 @@ module MSPRelease
 
     def at_version?(rhs_version)
       any_version == rhs_version
-    end
-
-    def version
-    end
-
-    def write_version(segment)
     end
 
     def bump_version(segment)

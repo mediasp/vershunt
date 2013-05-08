@@ -53,7 +53,7 @@ module MSPRelease
 
       defined?(super) ?
         Array(super).push(changelog.fname) :
-        [ruby_version_file]
+        [changelog.fname]
     end
 
     def version

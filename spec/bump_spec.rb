@@ -11,6 +11,8 @@ describe 'bump' do
 
         run_msp_release 'bump bugfix'
         last_run.should exit_with(0)
+        last_stderr.should_not include("Nothing specified, nothing added.")
+        last_stderr.should_not include("Maybe you wanted to say 'git add .'?")
         run "git --no-pager log -1"
         last_stdout.should include("BUMPED VERSION TO 0.0.2")
 
