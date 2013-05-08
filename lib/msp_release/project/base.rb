@@ -5,7 +5,7 @@ module MSPRelease
 
     RELEASE_COMMIT_PREFIX = "RELEASE COMMIT - "
 
-    attr_reader :config, :config_file
+    attr_reader :config, :config_file, :dir
 
     def initialize(config, dir='.')
       @dir = dir

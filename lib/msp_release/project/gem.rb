@@ -10,7 +10,7 @@ module MSPRelease
       end
 
       def package
-        "#{@project.gemspec_name}-#{@project.version}.gem"
+        "#{@dir}/#{@project.gemspec_name}-#{@project.version}.gem"
       end
 
       def files
@@ -19,25 +19,21 @@ module MSPRelease
     end
 
     def gemspec_file
-      @gemspec_file ||= begin
-        files = Dir.glob("#{@dir}/*.gemspec")
+      files = Dir.glob("#{@dir}/*.gemspec")
 
-        LOG.warn "Warning: more than one gemspec found" if files.count > 1
-        raise "Can't find gemspec" if files.count < 0
+      LOG.warn "Warning: more than one gemspec found" if files.count > 1
+      raise "Can't find gemspec" if files.count < 0
 
-        gemspec_file = files.first
-
-        LOG.debug "Using gemspec #{gemspec_file}"
-
-        gemspec_file
-      end
+      files.first
     end
 
     def gemspec_name
-      File.new(gemspec_file, 'r').readlines.find { |l|
-        l =~ /\w+\.name\s*=\s*(['"])(\w+)\1/
-      }
-      $2
+      @gemspec_name ||= Dir.chdir(@dir) do
+        File.new(gemspec_file, 'r').readlines.find { |l|
+          l =~ /\w+\.name\s*=\s*(['"])(\w+)\1/
+        }
+        $2
+      end
     end
 
     def name
@@ -48,19 +44,30 @@ module MSPRelease
       tag = "release-#{version}"
       check_tag = exec("git show-ref --tags #{tag}", :status => [0,1])
       unless check_tag == ""
-         LOG.error "Tag #{tag} already exists, you must bump the version before the next release"
+         LOG.error "Tag #{tag} already exists, you must bump the version before"\
+           " the next release"
          exit(1)
       end
       version
+    end
+
+    def prepare_for_build(branch_name, options={})
+      # new_dir = "#{gemspec_name}"
+
+      # FileUtils.mv(@dir, new_dir)
+      # @dir = new_dir
+
+      clean_checkout
+
+      super if defined?(super)
     end
 
     def build_command
       "gem build #{gemspec_file}"
     end
 
-
     def build_result(output_directory)
-      BuildResult.new(output_directory, self)
+      BuildResult.new(@dir, self)
     end
 
   end

@@ -30,16 +30,50 @@ describe 'build' do
   end
 
   describe "gem" do
-    describe "only repository argument given" do
-      before do
-        init_gem_project('gem_project', {})
-      end
+    before do
+      init_gem_project('gem_project', {})
+    end
 
+    describe "only repository argument given" do
       it "checks out the latest commint from master then builds from it" do
         in_tmp_dir do
           run_msp_release "build --verbose file:///#{@remote_repo}"
+          last_stdout.should match("Checking out latest commit from origin/master")
 
           last_run.should exit_with(0)
+
+          package_built_regex =
+            /(\/.*\/gem_project-[0-9]+\.[0-9]+\.[0-9]+\.gem)$/
+
+          build_products.count.should == 1
+          build_products.any? {|p| p.should match package_built_regex }
+
+          gem_fname = package_built_regex.match(last_stdout)[1]
+          File.exists?(gem_fname).should be_true
+        end
+      end
+    end
+
+    describe "in a working directory containing {project_name}_" do
+      it 'lets you checkout the latest from master and the builds it' do
+
+        in_tmp_dir 'project_builddir'  do
+          run_msp_release "build --verbose file:///#{@remote_repo}"
+
+          last_run.should exit_with(0)
+          last_stdout.should match("Checking out latest commit from origin/master")
+
+          checked_out_regex = /Checked out to .*vershunt.*\.tmp/
+            last_stdout.should match(checked_out_regex)
+          package_version = checked_out_regex.match(last_stdout)[1]
+
+          package_built_regex =
+            /(\/.*\/gem_project-[0-9]+\.[0-9]+\.[0-9]+\.gem)$/
+
+          last_stdout.should match(package_built_regex)
+
+          gem_fname = package_built_regex.match(last_stdout)[1]
+          File.exists?(gem_fname).should be_true
         end
       end
     end

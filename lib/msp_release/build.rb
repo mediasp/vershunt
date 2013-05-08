@@ -38,7 +38,7 @@ module MSPRelease
         File.directory?(dir)
 
       e = Exec.new(:name => 'build', :quiet => false, :status => :any)
-      Dir.chdir(dir) do
+      Dir.chdir(@project.dir) do
         e.exec(build_command)
       end
 
