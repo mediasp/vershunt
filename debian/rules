@@ -20,11 +20,9 @@ override_dh_prep:
 	dh_prep
 	mkdir build
 
-	# change shebang to lock it down
-	sed "s|#! /usr/bin/env ruby|#! /usr/bin/ruby1.8|" bin/msp_release > build/msp_release
+# 	change shebang to lock it down
 	sed "s|#! /usr/bin/env ruby|#! /usr/bin/ruby1.8|" bin/vershunt > build/vershunt
 	chmod 755 build/vershunt
-	chmod 755 build/msp_release
 
 	bundle install --without development --path build/vendor
 	mkdir build/flat
