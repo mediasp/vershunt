@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vershunt (2.0.1)
+    vershunt (2.0.2)
       POpen4 (~> 0.1.0)
       climate (~> 0.5.0)
 
