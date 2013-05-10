@@ -2,14 +2,32 @@ class MSPRelease::Git
 
   # methods that don't require a local clone
   module ClassMethods
+    def version()
+      MSPRelease::Exec.exec("git version", :output => StringIO.new)
+    end
+
+    def version_gte(maj, min=0, bug=0, patch=0)
+      match = version.match(/(\d+)\.(\d+)\.(\d+)\.(\d+).*/)
+      match[1].to_i >= maj &&
+        match[2].to_i >= min &&
+        match[3].to_i >= bug &&
+        match[4].to_i >= patch
+    end
+
     def clone(git_url, options={})
       out_to = options[:out_to]
       exec_options = options[:exec] || {}
       depth_arg = options[:depth].nil?? '' : "--depth #{options[:depth]}"
-      no_single_branch = options[:no_single_branch] ? '--no-single-branch' : ''
+      branch = options[:branch].nil?? '' : "--branch #{options[:branch]}"
+
+      single_branch = if version_gte(1, 7, 10)
+        options[:no_single_branch] ? '--no-single-branch' :
+          options[:single_branch] ? '--single-branch' :
+          ''
+      end
 
       MSPRelease::Exec.
-        exec("git clone #{depth_arg} #{no_single_branch} #{git_url} #{out_to.nil?? '' : out_to}", exec_options)
+        exec("git clone #{depth_arg} #{single_branch} #{branch} #{git_url} #{out_to.nil?? '' : out_to}", exec_options)
     end
   end
 
