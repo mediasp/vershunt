@@ -30,7 +30,7 @@ module MSPRelease
     def gemspec_name
       @gemspec_name ||= Dir.chdir(@dir) do
         File.new(gemspec_file, 'r').readlines.find { |l|
-          l =~ /\w+\.name\s*=\s*(['"])(\w+)\1/
+          l =~ /\w+\.name\s*=\s*(['"])([\w-]+)\1/
         }
         $2
       end
