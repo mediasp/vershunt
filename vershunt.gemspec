@@ -7,8 +7,8 @@ spec = Gem::Specification.new do |s|
   s.email = ["nick@playlouder.com"]
   s.summary = 'Repeatable build system tool'
   s.description = 'Maintain versioning information in a consistent way, then build debian packages consistently.'
-  s.executables = ['msp_release', 'vershunt']
-  s.files = ["bin/msp_release", "bin/vershunt"] + Dir["lib/**/*.rb"]
+  s.executables = ['vershunt']
+  s.files = ["bin/vershunt"] + Dir["lib/**/*.rb"]
   s.require_paths = ["lib"]
   s.rubygems_version = '1.3.5'
 
