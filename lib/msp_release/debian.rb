@@ -158,7 +158,7 @@ class Debian
   end
 
   def package_name
-    /[a-z\-]+/.match(read_top_line)
+    /[a-z0-9\-]+/.match(read_top_line)
   end
 
   def version_string_from_top_line
