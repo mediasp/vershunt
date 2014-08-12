@@ -37,7 +37,7 @@ describe 'build' do
     describe "only repository argument given" do
       it "checks out the latest commint from master then builds from it" do
         in_tmp_dir do
-          run_msp_release "build --verbose file:///#{@remote_repo}"
+          run_msp_release "build --verbose file://#{@remote_repo}"
           last_stdout.should match("Checking out latest commit from origin/master")
 
           last_run.should exit_with(0)
@@ -58,7 +58,7 @@ describe 'build' do
       it 'lets you checkout the latest from master and the builds it' do
 
         in_tmp_dir 'project_builddir'  do
-          run_msp_release "build --verbose file:///#{@remote_repo}"
+          run_msp_release "build --verbose file://#{@remote_repo}"
 
           last_run.should exit_with(0)
           last_stdout.should match("Checking out latest commit from origin/master")
@@ -88,7 +88,7 @@ describe 'build' do
       "the build a development version string" do
 
       in_tmp_dir do
-        run_msp_release "build --verbose file:///#{@remote_repo}"
+        run_msp_release "build --verbose file://#{@remote_repo}"
 
         last_run.should exit_with(0)
         last_stdout.should match("Checking out latest commit from origin/master")
@@ -125,7 +125,7 @@ describe 'build' do
         "the build a development version string" do
 
         in_tmp_dir do
-          run_msp_release "build --verbose file:///#{@remote_repo}"
+          run_msp_release "build --verbose file://#{@remote_repo}"
 
           last_run.should exit_with(0)
           last_stdout.should match("Checking out latest commit from origin/master")
@@ -152,7 +152,7 @@ describe 'build' do
 
       it 'lets you specify a different distribution to the one in source control' do
         in_tmp_dir do
-          run_msp_release "build --verbose --debian-distribution=tinternet #{@remote_repo}"
+          run_msp_release "build --verbose --debian-distribution=tinternet file://#{@remote_repo}"
 
           last_run.should exit_with(0)
           last_stdout.should match("Checking out latest commit from origin/master")
@@ -171,7 +171,7 @@ describe 'build' do
         it 'lets you checkout the latest from master and the builds it' do
 
           in_tmp_dir 'project_builddir'  do
-            run_msp_release "build --verbose #{@remote_repo}"
+            run_msp_release "build --verbose file://#{@remote_repo}"
 
             last_run.should exit_with(0)
             last_stdout.should match("Checking out latest commit from origin/master")
@@ -196,14 +196,15 @@ describe 'build' do
         build_init_project('project', {})
 
         in_project_dir do
-          exec("git branch feature-llama")
+          exec("git checkout -b feature-llama")
           exec("git push origin feature-llama")
+          exec("git remote -v")
         end
       end
 
       it "complains if the branch does not exist" do
         in_tmp_dir do
-          run_msp_release "build --verbose  #{@remote_repo} feature-alpaca"
+          run_msp_release "build --verbose  file://#{@remote_repo} feature-alpaca"
           last_run.should exit_with(1)
           last_stderr.should match("Git pathspec 'origin/feature-alpaca' does not exist")
         end
@@ -212,7 +213,7 @@ describe 'build' do
       it "checks out the branch and builds from HEAD, giving the build a spiffy" +
         " development version including the branch info" do
         in_tmp_dir do
-          run_msp_release "build --verbose  #{@remote_repo} feature-llama"
+          run_msp_release "build --verbose  file://#{@remote_repo} feature-llama"
           last_run.should exit_with(0)
           last_stdout.should match("Checking out latest commit from origin/feature-llama")
 
@@ -248,7 +249,7 @@ describe 'build' do
 
       it "complains if the branch does not exist" do
         in_tmp_dir do
-          run_msp_release "build --verbose #{@remote_repo} release-2.0"
+          run_msp_release "build --verbose file://#{@remote_repo} release-2.0"
           last_run.should exit_with(1)
           last_stderr.should match("Git pathspec 'origin/release-2.0' does not exist")
         end
@@ -256,7 +257,7 @@ describe 'build' do
 
       it "checks out the latest release commit from the branch then builds it" do
         in_tmp_dir do
-          run_msp_release "build --verbose #{@remote_repo} release-0.0"
+          run_msp_release "build --verbose file://#{@remote_repo} release-0.0"
 
           last_run.should exit_with(0)
           last_stdout.should match("Checking out latest release commit from origin/release-0.0")
@@ -298,7 +299,7 @@ describe 'build' do
 
       it "will checkout the repository with short history (the default)" do
         in_tmp_dir do
-          run_msp_release "build --verbose file:///#{@remote_repo}"
+          run_msp_release "build --verbose file://#{@remote_repo}"
           last_run.should exit_with(0)
           last_stdout.should match("^Checking out latest commit from origin/master \\(shallow\\)$")
           version_regex = /Checked out to project\-([0-9]{14}-git\+[a-f0-9]{6}~master)/
@@ -322,7 +323,7 @@ describe 'build' do
 
       it "can checkout the repository with full history" do
         in_tmp_dir do
-          run_msp_release "build --verbose --no-shallow file:///#{@remote_repo}"
+          run_msp_release "build --verbose --no-shallow file://#{@remote_repo}"
           last_run.should exit_with(0)
           last_stdout.should match("^Checking out latest commit from origin/master$")
           version_regex = /Checked out to project\-([0-9]{14}-git\+[a-f0-9]{6}~master)/
@@ -359,7 +360,7 @@ describe 'build' do
     it "defaults to being quiet-ish" do
 
       in_tmp_dir do
-        run_msp_release "build #{@remote_repo}"
+        run_msp_release "build file://#{@remote_repo}"
         last_run.should exit_with(0)
 
         lines = last_stdout.split("\n")
@@ -369,7 +370,7 @@ describe 'build' do
 
     it "can be told to shut right up" do
       in_tmp_dir do
-        run_msp_release "build --silent #{@remote_repo}"
+        run_msp_release "build --silent file://#{@remote_repo}"
         last_run.should exit_with(0)
 
         lines = last_stdout.strip.should == ""
@@ -378,7 +379,7 @@ describe 'build' do
 
     it "will print some helpful output to stdout if you give --verbose" do
       in_tmp_dir do
-        run_msp_release "build --verbose #{@remote_repo}"
+        run_msp_release "build --verbose file://#{@remote_repo}"
         last_run.should exit_with(0)
 
         last_stdout.should match("Checking out latest commit from origin/master")
@@ -388,7 +389,7 @@ describe 'build' do
 
     it "will print dpkg-buildpackage output to stderr if specified" do
       in_tmp_dir do
-        run_msp_release "build --noisy #{@remote_repo}"
+        run_msp_release "build --noisy file://#{@remote_repo}"
         last_run.should exit_with(0)
 
         lines = last_stdout.split("\n")

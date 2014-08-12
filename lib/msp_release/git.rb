@@ -6,12 +6,11 @@ class MSPRelease::Git
       MSPRelease::Exec.exec("git version", :output => StringIO.new)
     end
 
-    def version_gte(maj, min=0, bug=0, patch=0)
-      match = version.match(/(\d+)\.(\d+)\.(\d+)\.(\d+).*/)
+    def version_gte(maj, min=0, bug=0)
+      match = version.match(/(\d+)\.(\d+)\.(\d+)\..*/)
       match[1].to_i >= maj &&
         match[2].to_i >= min &&
-        match[3].to_i >= bug &&
-        match[4].to_i >= patch
+        match[3].to_i >= bug
     end
 
     def clone(git_url, options={})
@@ -19,6 +18,13 @@ class MSPRelease::Git
       exec_options = options[:exec] || {}
       depth_arg = options[:depth].nil?? '' : "--depth #{options[:depth]}"
       branch = options[:branch].nil?? '' : "--branch #{options[:branch]}"
+
+      heads = StringIO.new
+      MSPRelease::Exec.exec("git ls-remote --heads #{git_url}", :output => heads)
+
+      unless heads.string.match(/#{options[:branch]}/)
+        raise MSPRelease::CLI::Exit, "Git pathspec 'origin/#{options[:branch]}' does not exist"
+      end
 
       single_branch = if version_gte(1, 7, 10)
         options[:no_single_branch] ? '--no-single-branch' :

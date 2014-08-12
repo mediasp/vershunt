@@ -31,7 +31,7 @@ module MSPRelease
           end
         end
 
-        exec("git checkout --track #{pathspec}")
+        exec("git checkout #{pathspec}")
       end
     end
 
